@@ -65,7 +65,7 @@
             <body>
             <h2>Registrazione</h2>
             <form method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">   <!-- usiamo il metodo post per la sicurezza, per lo stesso motivo utilizziamo il metodo htmlspecialchars -->
-                Email <br> <input type="text" vale= "email" name="email"/> <br>
+                Email <br> <input type="text" name="email"/> <br>
                 Password <br> <input type="password" name="password"/> <br>
                 Conferma Password <br> <input type="password" name="password_cmp"/> <br>
                 <br> <input type="submit" value="Registrati" name ="register"/>

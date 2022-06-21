@@ -25,7 +25,10 @@
             $error.="Non hai inserito il campo 'Password'<br>";
         }
 
-        if(logged(clearInput($_POST['email']),clearInput($_POST['password'])))  //ripulisce e controlla l'input della mail e della passsword
+        if(checkpassword($_POST['email'],$_POST['password']) == false && checkEmail(clearInput($_POST['email']))){
+            $error.="Password errata<br>";
+        }
+        else if(logged(clearInput($_POST['email']),clearInput($_POST['password'])))  //ripulisce e controlla l'input della mail e della passsword
         {
             $_SESSION['user'] = $_POST['email'];      //setta l'user con il valore della mail inserita
         }else{                  //se sono errati riporta un messaggio di errore
@@ -35,7 +38,7 @@
     }
 
     if (isset($_SESSION['user'])){          //una volta effettuato il login si verrà renderizzati alla pagina index.php
-        header("Location:index.php");
+        header("Location:fridge.php");
         exit();    
     }else if(!isset($_SESSION['user'])){    //al primo avvio entrerà in questa sessione dove verrà visualizzato il form dove inserire email e password
 ?>
@@ -47,7 +50,7 @@
         <body>
         <h2>Login</h2>
         <form method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">   <!-- usiamo il metodo post per la sicurezza, per lo stesso motivo utilizziamo il metodo htmlspecialchars -->
-            Email <br> <input type="text" vale= "email" name="email"/> <br>
+            Email <br> <input type="email" vale= "email" name="email"/> <br>
             Password <br> <input type="password" name="password"/> <br>
             <br><input type="submit"  value="Login" name ="login"/>
         </form>

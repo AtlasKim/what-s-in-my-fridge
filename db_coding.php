@@ -153,4 +153,102 @@ function linkFridge($email,$id)
         return array("KO", "Errore durante la creazione del frigo");
     }
 }
+
+function getFridgeId($email)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT id_fridge FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $res = $stmt->fetch();
+        if($res != null)
+        {
+            return $res;
+        }
+        return array("KO", "Errore: frigo non ancora inserito");
+    }catch(PDOException $e){
+        return array("KO", "Errore durante la connessione");
+    }
+}
+
+function getFood()
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT nome_cibo FROM food");
+        $stmt->execute([]);
+        $food = $stmt->fetchAll();                 //estrae il risultato della query
+        if($food !=null)
+            for($i = 0; $i < sizeof($food);$i++)
+            {
+                $food_array[$i] = $food[$i]["nome_cibo"];
+            }
+            return $food_array;
+        return false;
+    }catch(PDOException $e){
+        return false;
+    }
+}
+
+
+
+function insert_food_db($food_name)                                         //funzione che inserisce l'alimento nella tabella food
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("INSERT INTO food (id,nome_cibo) VALUES (NULL, ?)");
+        $stmt->execute([$food_name]);
+        return array("OK");
+    }catch(PDOException $e){
+        return array("KO", "Inserimento cibo nel database non riuscito");
+    }
+}
+
+function insert_food_fridge($id_alimento,$quantity,$scadenza,$id_fridge)        //funzione che inserisce il cibo nella tabella contains
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("INSERT INTO contain (id_frigo,id_cibo,quantita,data_scadenza) VALUES (?,?,?,?)");
+        $stmt->execute([$id_fridge,$id_alimento,$quantity,$scadenza]);          //probabilmente non sta inserendo la data di scadenza
+        return array("OK");
+    }catch(PDOException $e){
+        return array("KO", "Inserimento cibo nel frigo non riuscito");
+    }
+}
+
+function checkFood($alimento)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT nome_cibo FROM food WHERE nome_cibo = ?");
+        $stmt->execute([$alimento]);
+        $res = $stmt->fetch();                  //estrae il risultato della query
+        if($res !=null)
+            return true;
+        return false;
+    }catch(PDOException $e){
+        return false;
+    }
+}
+
+function getFoodId($alimento)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT id FROM food WHERE nome_cibo = ?");
+        $stmt->execute([$alimento]);
+        $res = $stmt->fetch();                  //estrae il risultato della query
+        if($res !=null)
+            return $res[0];                        //ritorna l'id dell'alimento, res è un array quindi devo ritornare il primo elemento dell'array (che in teoria è anche l'unico)
+        return NULL;
+    }catch(PDOException $e){
+        return NULL;
+    }
+}
 ?>

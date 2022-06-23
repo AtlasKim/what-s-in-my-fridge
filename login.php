@@ -30,7 +30,13 @@
         }
         else if(logged(clearInput($_POST['email']),clearInput($_POST['password'])))  //ripulisce e controlla l'input della mail e della passsword
         {
-            $_SESSION['user'] = $_POST['email'];      //setta l'user con il valore della mail inserita
+            $_SESSION['user'] = $_POST['email'];                        //setta l'user con il valore della mail inserita
+
+            $id_fridge = getFridgeId($_SESSION["user"]);
+            if (!empty($id_fridge))
+                $_SESSION['fridge'] = $id_fridge;                       //e l'id del frigo a quello corrispondente all'utente se è stato già inserito
+            else
+                unset($_SESSION['fridge']);
         }else{                  //se sono errati riporta un messaggio di errore
             $error.="La mail inserita non è associata a nessun account<br>";
         }

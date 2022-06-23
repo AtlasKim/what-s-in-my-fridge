@@ -119,14 +119,14 @@ function createFridge($email)                   //funzione che crea il frigo e l
             return array("KO", "Errore, frigo già associato all'account");
         else
         {
-            $stmt = $conn->prepare("INSERT INTO `fridge` (`id`, `marca`, `modello`) VALUES (NULL, '', '')");     //crea un nuovo frigo vuoto
+            $stmt = $conn->prepare("INSERT INTO fridge (id,marca,modello) VALUES (NULL,'','')");     //crea un nuovo frigo vuoto
             $stmt->execute();
 
             $stmt = $conn->prepare("SELECT id FROM fridge");                                                            
             $stmt->execute();
-            $fridge = $stmt->fetch();
-            $stmt = $conn->prepare("UPDATE `users` SET `id_fridge` = ? WHERE `users`.`email` = ?");             //prende l'id appena inserito e lo associa all'utente attualmente in uso
-            $stmt->execute([max($fridge),$email]);
+            $fridge = $stmt->fetchAll();
+            $stmt = $conn->prepare("UPDATE `users` SET `id_fridge` = ? WHERE `users`.`email` = ?");             
+            $stmt->execute([max($fridge)[0],$email]);                                                           //prende l'id più grande che corrisponde anche all'ultimo inserito e lo inserisce nella tabella users nel campo id_fridge        
             return array("OK");
         }
     }catch(PDOException $e){
@@ -164,11 +164,11 @@ function getFridgeId($email)
         $res = $stmt->fetch();
         if($res != null)
         {
-            return $res;
+            return $res[0];
         }
-        return array("KO", "Errore: frigo non ancora inserito");
+        return NULL;
     }catch(PDOException $e){
-        return array("KO", "Errore durante la connessione");
+        return NULL;
     }
 }
 
@@ -236,6 +236,22 @@ function checkFood($alimento)
     }
 }
 
+function getFoodById($id_alimento)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT nome_cibo FROM food WHERE id = ?");
+        $stmt->execute([$id_alimento]);
+        $res = $stmt->fetch();                  //estrae il risultato della query
+        if($res !=null)
+            return $res;                        //se l'alimento è stato trovato allora ritornalo
+        return false;                           //altrimenti ritorna false, non fa distinzione se non riesce a collegarsi al database
+    }catch(PDOException $e){
+        return false;
+    }
+}
+
 function getFoodId($alimento)
 {
     try{
@@ -247,6 +263,69 @@ function getFoodId($alimento)
         if($res !=null)
             return $res[0];                        //ritorna l'id dell'alimento, res è un array quindi devo ritornare il primo elemento dell'array (che in teoria è anche l'unico)
         return NULL;
+    }catch(PDOException $e){
+        return NULL;
+    }
+}
+
+//creare una funzione che restituisce il numero di alimenti all'interno di un determinato frigo
+//il select dovrebbe far ritornare tutte le informazioni degli alimenti contenuti al suo interno, quindi Nome, quantità e data di scadenza
+function getContainedFood($id_fridge)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT nome_cibo, quantita, data_scadenza FROM food INNER JOIN contain ON food.id = contain.id_cibo WHERE id_frigo = ?");       //inner join per ottenere tutti i dati relativi al cibo contenuto nel frigo
+        $stmt->execute([$id_fridge]);
+        $res = $stmt->fetchAll();                  //estrae il risultato della query
+        
+        if($res !=null)
+            return $res;  
+        else
+            return NULL;
+    }catch(PDOException $e){
+        return NULL;
+    }
+}
+
+function getContainedFoodId($id_fridge)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT id_cibo FROM contain WHERE id_frigo = ?");       //estrae dalla tabella contain tutti gli id dei cibi contenuti al suo interno
+        $stmt->execute([$id_fridge]);
+        $res = $stmt->fetchAll();                  //estrae il risultato della query
+        
+        if($res !=null)
+        {
+            for($i = 0; $i < sizeof($res);$i++)
+            {
+                $food_array[$i] = $res[$i]["id_cibo"];      //$res è un dizionario, quindi per creare un array di valori scorriamo per le chiavi del dizionario e salviamo i singoli valori
+            }
+            return $food_array;  
+        }
+        else
+            return NULL;
+    }catch(PDOException $e){
+        return NULL;
+    }
+}
+
+
+function clearContainedFood($id_food,$id_fridge)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("DELETE FROM contain WHERE id_cibo = ? AND id_frigo = ?");       //inner join per ottenere tutti i dati relativi al cibo contenuto nel frigo
+        $stmt->execute([$id_cibo,$id_fridge]);
+        $res = $stmt->fetch();                  
+        
+        if($res !=null)
+            return $res;  
+        else
+            return NULL;
     }catch(PDOException $e){
         return NULL;
     }

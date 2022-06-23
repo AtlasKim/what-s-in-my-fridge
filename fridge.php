@@ -6,12 +6,12 @@
     require 'db_coding.php'; //Import dei file contententi metodi e variabili globali per effettuare operazioni sul DB
     require 'config/db_config.php';
 
-    if(isset(($_POST['new_fridge']))){
+    if(isset(($_POST['new_fridge']))){                                  //se è stata selezionata l'opzione nuovo frigo allora crea un nuovo frigo collegato all'account
         $op = createFridge($_SESSION["user"]);
         if($op[0] == 'OK')
         {
             echo "Frigo creato con successo";
-            $_SESSION['fridge'] = getFridgeId($_SESSION["user"]);
+            $_SESSION["fridge"] = getFridgeId($_SESSION["user"]);
         }else{
             echo "Errore tecnico: ".$op[1];
         }
@@ -21,7 +21,7 @@
         if($op[0] == 'OK')
         {
             echo "Frigo collegato con successo";
-            $_SESSION['fridge'] = $_POST["id_fridge"];
+            $_SESSION["fridge"] = $_POST["id_fridge"];
         }else{
             echo "Errore tecnico: ".$op[1];
         }
@@ -37,13 +37,13 @@
         else if($_POST['alimenti']!="empty")
         {
             //inserisci il cibo preso dal menù a tendina nella tabella contains
-            insert_food_fridge(getFoodId($_POST['alimenti']),$_POST['quantity'],$_POST['scadenza'],$_SESSION['fridge']);
+            insert_food_fridge(getFoodId($_POST['alimenti']),$_POST['quantity'],$_POST['scadenza'],$_SESSION["fridge"]);
         }else
         {
             //inserisci il nuovo cibo nel database food se non era già presente e dopo inseriscilo nella tabella contains 
             if(checkFood($_POST['other_food'])==false && !empty($_POST['other_food'])){
                 insert_food_db($_POST['other_food']);
-                insert_food_fridge(getFoodId($_POST['other_food']),$_POST['quantity'],$_POST['scadenza'],$_SESSION['fridge']);
+                insert_food_fridge(getFoodId($_POST['other_food']),$_POST['quantity'],$_POST['scadenza'],$_SESSION["fridge"]);
             }else
                 $error.="Campo altro cibo vuoto, selezionarne uno dal menù a tendina o inserirne uno nuovo<br>";
         }
@@ -53,7 +53,7 @@
     ?>
 
     <?php
-    if (!isset($_SESSION['fridge']))
+    if (!isset($_SESSION["fridge"]))
     {
     ?>
         <html>
@@ -72,7 +72,7 @@
             </body>    
         </html><?php
     }
-    else if(isset($_SESSION['fridge']))
+    else
     {?>
         <html>
             <head>
@@ -100,15 +100,16 @@
                 ?>
   
                 var food_list = document.getElementById('alimenti');
+
                 var option = document.createElement('option');
-                option.value = "empty";                               //potrei dover re inserire food[i] se non funziona con l'indice corretto
+                option.value = "empty";                               
                 option.text = "--";
                 food_list.appendChild(option); 
 
                 for(let i = 0; i<food.length; i++){                 //inserisce dinamicamente le opzioni di tutti i cibi già presenti nel database
-                    var option = document.createElement('option');
-                    option.value = food[i];                               //potrei dover re inserire food[i] se non funziona con l'indice corretto
-                    option.text = food[i];
+                    var option = document.createElement('option');  //crea l'opzione
+                    option.value = food[i];                         //il valore dell'opzione sarà corrispondente al nome dei cibi      
+                    option.text = food[i];                          //così come il testo al suo interno
                     food_list.appendChild(option);                  //aggiunge al datalist dinamicamente tutte le opzioni presenti nel database
                 }
             </script>        

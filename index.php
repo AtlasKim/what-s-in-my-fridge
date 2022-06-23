@@ -5,12 +5,13 @@
 
 <?php
 //require 'config.php';
-require 'db_coding.php'; //Import dei file contententi metodi e variabili globali per effettuare operazioni sul DB
+require 'db_coding.php';                //Import dei file contententi metodi e variabili globali per effettuare operazioni sul DB
 require 'config/db_config.php';
 
+echo $_SESSION["fridge"];
 
 if(isset($_POST['changepsw'])){         //se viene dato il submit per la modifica password viene effettuata l'operazione sul database
-    $op = changepassword(clearInput($_SESSION['user']),clearInput($_POST['password']));
+    $op = changepassword(clearInput($_SESSION["user"]),clearInput($_POST["password"]));
     if($op[0] == 'OK'){
         echo "Password cambiata";
     }else{
@@ -19,6 +20,7 @@ if(isset($_POST['changepsw'])){         //se viene dato il submit per la modific
 }else if(isset($_POST['logout']))
 {
     unset($_SESSION["user"]);
+    unset($_SESSION["fridge"]);
     header("Location:login.php");  
 }
 ?>
@@ -30,7 +32,7 @@ if(isset($_POST['changepsw'])){         //se viene dato il submit per la modific
 
 <body>
 <?php
-if(isset($_SESSION['user'])){
+if(isset($_SESSION["user"])){
 ?>
     <h2> Benvenuto <?php echo $_SESSION["user"]; ?></h2>
     <form method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">

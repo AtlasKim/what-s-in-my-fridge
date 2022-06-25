@@ -37,14 +37,22 @@
         else if($_POST['alimenti']!="empty")
         {
             //inserisci il cibo preso dal menù a tendina nella tabella contains
-            insert_food_fridge(getFoodId($_POST['alimenti']),$_POST['quantity'],$_POST['scadenza'],$_SESSION["fridge"]);
-        }else
+            if(checkContainedFood(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['scadenza'])==true)             //Se l'alimento è già presente in frigo e ha quella stessa data di scadenza allora aggiornare la quantità (sommandola)
+            {
+                updateContainedFoodQuantity(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['quantity'],$_POST['scadenza']);
+            }
+            else
+                insert_food_fridge(getFoodId($_POST['alimenti']),$_POST['quantity'],$_POST['scadenza'],$_SESSION["fridge"]);
+        }else if($_POST['alimenti']=="empty" && !empty($_POST['other_food']))                                                 //inserisci il nuovo cibo nel database food se non era già presente e dopo inseriscilo nella tabella contains 
         {
-            //inserisci il nuovo cibo nel database food se non era già presente e dopo inseriscilo nella tabella contains 
-            if(checkFood($_POST['other_food'])==false && !empty($_POST['other_food'])){
+            if(checkFood($_POST['other_food'])==false)
+            {
                 insert_food_db($_POST['other_food']);
+            }else if (checkFood($_POST['other_food'])==true)
+            {
                 insert_food_fridge(getFoodId($_POST['other_food']),$_POST['quantity'],$_POST['scadenza'],$_SESSION["fridge"]);
-            }else
+            }        
+            else
                 $error.="Campo altro cibo vuoto, selezionarne uno dal menù a tendina o inserirne uno nuovo<br>";
         }
         echo $error;

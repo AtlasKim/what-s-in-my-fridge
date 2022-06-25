@@ -5,14 +5,13 @@
 <?php
     require 'db_coding.php'; //Import dei file contententi metodi e variabili globali per effettuare operazioni sul DB
     require 'config/db_config.php';
-    /*$aliments = json_encode(getContainedFood($_SESSION["fridge"]));
-    echo $aliments;
-    $id_food = json_encode(getContainedFoodId($_SESSION["fridge"]));*/
 
     if(isset($_GET["cancel_food"]))
     {
-        //echo $_GET["cancel_food"];
-        clearContainedFood($_GET["cancel_food"],getFridgeId($_SESSION["user"]));                     //dovrebbe cancellare l'alimento selezionato tramite bottoni, poi fare l'unset per evitare che resti settato
+        //var_dump($_GET["cancel_food"]);
+        //var_dump($_GET['expiration']);
+        //$quantity = getContainedFoodQuantity($_GET["cancel_food"],getFridgeId($_SESSION["user"]),$_GET["expiration"]);
+        clearContainedFood($_GET["cancel_food"]);      //dovrebbe cancellare l'alimento selezionato tramite bottoni, poi fare l'unset per evitare che resti settato
         unset($_GET["cancel_food"]);
         echo "<script>alert('Alimento cancellato con successo!');</script>";  
     }
@@ -50,32 +49,39 @@
                         const tr = food_table.insertRow();
                         for(let j=0;j<3;j++)
                         {
-                            let td = tr.insertCell();                    //provare a usare questa funzione per dare a ogni pulsante di cancellazione l'id del cibo corrispondente
-                            td.innerHTML = food[i][j];                 //aggiunge al datalist dinamicamente tutte le opzioni presenti nel database
+                            let td = tr.insertCell();                               //provare a usare questa funzione per dare a ogni pulsante di cancellazione l'id del cibo corrispondente
+                            td.innerHTML = food[i][j];                              //aggiunge al datalist dinamicamente tutte le opzioni presenti nel database
                         }
+                        
+                        let status = tr.insertCell();
+                        let emoji = emoji_status(food[i][2]);
+                        status.innerHTML = emoji;
 
                         var button = document.createElement('button');
                         
                         button.name = "cancel_food";                                //scoprire come dare l'input a PHP per passare l'id dell'alimento da cancellare tramite la funzione
                         button.type = "submit";
-                        button.value = jid_food[i];                                 //prende l'id corrispondente all'alimento in questione
+                        button.value = food[i][3];                                 //prende l'id e la data di scadenza corrispondente all'alimento in questione
                         button.innerHTML = "Cancella alimento";
-                        //button.onclick = cancelFood(jid_food[i]);
-                        
-                                                                                //crea automaticamente le righe contenenti i vari alimenti
-                        tr.appendChild(button);                                                    //inserire qui pulsante per la cancellazione dell'oggetto in questione dalla tabella contain
+                        tr.appendChild(button);                                    //crea automaticamente le righe contenenti i vari alimenti
+                                                                                //inserire qui pulsante per la cancellazione dell'oggetto in questione dalla tabella contain
                     }
 
 
-                    /*function cancelFood(id_food) {
-                        let text = "Sei sicuro di voler eliminare l'alimento "+id_food+"?";
-                        if (confirm(text) == true) {
-                            text = "You pressed OK!";
-                        } else {
-                            text = "You canceled!";
-                        }
-                        document.getElementById("message").innerHTML = text;
-                        }*/
+                    function emoji_status(expiration_date) {
+                        const current_date = new Date();
+                        const exp_date = new Date(expiration_date);
+
+                        let difference_in_time = exp_date.getTime() - current_date.getTime();    //variabile contenente la differenza in millisecondi tra le due date
+                        let difference_in_days = difference_in_time / (1000 * 3600 * 24);               //calcola invece la differenza in giorni tra la data di scadenza e la data odierna
+                        
+                        if (difference_in_days <0 )                                                     //se la differenza è minore di 0 allora l'alimento è scaduto 
+                            return "&#128308;";                                                         //ritorna il codice corrispondente all'emoji del cerchio rosso
+                        else if(7>difference_in_days>0)                                                 //se l'alimento scade tra una settimana ritorna un cerchio giallo
+                            return "&#128993;";
+                        else if(difference_in_days>7)                                                   //se scade tra più di una settimana cerchio verde
+                            return "&#128994;";
+                    }
                 </script>
             </table>
         </form>

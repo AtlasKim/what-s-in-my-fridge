@@ -225,7 +225,7 @@ function checkFood($alimento)
     try{
         $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("SELECT nome_cibo FROM food WHERE nome_cibo = ?");
+        $stmt = $conn->prepare("SELECT nome_cibo FROM food WHERE nome_cibo = ?");       //controlla se l'alimento è nella tabella food
         $stmt->execute([$alimento]);
         $res = $stmt->fetch();                  //estrae il risultato della query
         if($res !=null)
@@ -275,7 +275,7 @@ function getContainedFood($id_fridge)
     try{
         $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("SELECT nome_cibo, quantita, data_scadenza FROM food INNER JOIN contain ON food.id = contain.id_cibo WHERE id_frigo = ?");       //inner join per ottenere tutti i dati relativi al cibo contenuto nel frigo
+        $stmt = $conn->prepare("SELECT nome_cibo, quantita, data_scadenza,id_riga FROM food INNER JOIN contain ON food.id = contain.id_cibo WHERE id_frigo = ? ORDER BY data_scadenza");       //inner join per ottenere tutti i dati relativi al cibo contenuto nel frigo
         $stmt->execute([$id_fridge]);
         $res = $stmt->fetchAll();                  //estrae il risultato della query
         
@@ -312,14 +312,13 @@ function getContainedFoodId($id_fridge)
     }
 }
 
-
-function clearContainedFood($id_food,$id_fridge)
+function getContainedFoodQuantity($id_food,$id_fridge,$expire_date)
 {
     try{
         $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("DELETE FROM contain WHERE id_cibo = ? AND id_frigo = ?");       //inner join per ottenere tutti i dati relativi al cibo contenuto nel frigo
-        $stmt->execute([$id_cibo,$id_fridge]);
+        $stmt = $conn->prepare("SELECT quantita FROM contain WHERE id_cibo = ? AND id_frigo = ? AND data_scadenza = ?");       //questa funzione ritorna la quantità di un determinato alimento con una determinata data di scadenza
+        $stmt->execute([$id_food,$id_fridge,$expire_date]);
         $res = $stmt->fetch();                  
         
         if($res !=null)
@@ -330,4 +329,79 @@ function clearContainedFood($id_food,$id_fridge)
         return NULL;
     }
 }
+
+
+function getContainedFoodExpirationDate($id_food,$id_fridge)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT data_scadenza FROM contain WHERE id_cibo = ? AND id_frigo = ?");       //questa funzione ritorna la data di scadenza di un cibo inserito nel database, utilizzando l'id del frigo e del cibo
+        $stmt->execute([$id_food,$id_fridge]);
+        $res = $stmt->fetch();                  
+        
+        if($res !=null)
+            return $res[0];  
+        else
+            return NULL;
+    }catch(PDOException $e){
+        return NULL;
+    }
+}
+
+function updateContainedFoodQuantity($id_food,$id_fridge,$quantity,$expire_date)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("UPDATE contain SET quantita = quantita + ? WHERE id_cibo = ? AND id_frigo = ? AND data_scadenza = ?");       //questa funzione ritorna la data di scadenza di un cibo inserito nel database, utilizzando l'id del frigo e del cibo
+        $stmt->execute([$quantity,$id_food,$id_fridge,$expire_date]);
+        $res = $stmt->fetch();                  
+        
+        if($res !=null)
+            return true;  
+        else
+            return NULL;
+    }catch(PDOException $e){
+        return NULL;
+    }
+}
+
+
+function checkContainedFood($id_food,$id_fridge,$expire_date)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT quantita FROM contain  WHERE id_cibo = ? AND id_frigo = ? AND data_scadenza = ?");       //questa funzione ritorna true se è già presente nel frigo lo stesso elemento con la stessa data di scadenza
+        $stmt->execute([$id_food,$id_fridge,$expire_date]);
+        $res = $stmt->fetch();                  
+        
+        if($res !=null)
+            return $res;  
+        else
+            return false;
+    }catch(PDOException $e){
+        return false;
+    }
+}
+
+function clearContainedFood($id_row)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("DELETE FROM contain WHERE id_riga = ? ");       //dobbiamo utilizzare anche la data di scadenza per cancellare esattamente quell'alimento
+        $stmt->execute([$id_row]);
+        $res = $stmt->fetch();                  
+        
+        if($res !=null)
+            return $res;  
+        else
+            return NULL;
+    }catch(PDOException $e){
+        return NULL;
+    }
+}
+
 ?>

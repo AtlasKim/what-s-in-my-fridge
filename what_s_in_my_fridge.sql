@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Giu 21, 2022 alle 19:44
+-- Creato il: Giu 26, 2022 alle 12:04
 -- Versione del server: 10.4.24-MariaDB
 -- Versione PHP: 8.1.6
 
@@ -30,16 +30,21 @@ SET time_zone = "+00:00";
 CREATE TABLE `contain` (
   `id_frigo` int(11) NOT NULL,
   `id_cibo` int(11) NOT NULL,
-  `quantita` int(10) UNSIGNED NOT NULL DEFAULT 1,
-  `data_scadenza` date NOT NULL
+  `quantita` int(10) UNSIGNED DEFAULT NULL,
+  `grammi` int(11) UNSIGNED DEFAULT NULL,
+  `data_scadenza` date NOT NULL,
+  `id_riga` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dump dei dati per la tabella `contain`
 --
 
-INSERT INTO `contain` (`id_frigo`, `id_cibo`, `quantita`, `data_scadenza`) VALUES
-(18, 12, 2, '2022-06-29');
+INSERT INTO `contain` (`id_frigo`, `id_cibo`, `quantita`, `grammi`, `data_scadenza`, `id_riga`) VALUES
+(18, 14, 2, NULL, '2022-06-27', 19),
+(18, 10, NULL, 500, '2022-07-01', 20),
+(18, 13, 4, NULL, '2022-06-26', 21),
+(18, 3, 20, NULL, '2022-07-09', 22);
 
 -- --------------------------------------------------------
 
@@ -63,7 +68,9 @@ INSERT INTO `food` (`id`, `nome_cibo`) VALUES
 (5, 'carne'),
 (9, 'merluzzo'),
 (10, 'pesce spada'),
-(12, 'melanzane');
+(12, 'melanzane'),
+(13, 'carciofi'),
+(14, 'uova');
 
 -- --------------------------------------------------------
 
@@ -82,7 +89,9 @@ CREATE TABLE `fridge` (
 --
 
 INSERT INTO `fridge` (`id`, `marca`, `modello`) VALUES
-(18, '', '');
+(18, '', ''),
+(19, '', ''),
+(27, '', '');
 
 -- --------------------------------------------------------
 
@@ -102,8 +111,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `id_fridge`) VALUES
-(1, 'eri.07@hotmail.it', 'Fuffi', NULL),
-(2, 'xxatlas98xx@gmail.com', 'Sunny', NULL),
+(1, 'eri.07@hotmail.it', 'Fuffi', 19),
+(2, 'xxatlas98xx@gmail.com', 'Sunny', 18),
 (3, 'carmelo98.trifiro@gmail.com', '151823428sS', 18);
 
 --
@@ -114,6 +123,7 @@ INSERT INTO `users` (`id`, `email`, `password`, `id_fridge`) VALUES
 -- Indici per le tabelle `contain`
 --
 ALTER TABLE `contain`
+  ADD PRIMARY KEY (`id_riga`),
   ADD KEY `fk_frigo` (`id_frigo`),
   ADD KEY `fk_cibo` (`id_cibo`);
 
@@ -141,16 +151,22 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT per la tabella `contain`
+--
+ALTER TABLE `contain`
+  MODIFY `id_riga` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
 -- AUTO_INCREMENT per la tabella `food`
 --
 ALTER TABLE `food`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT per la tabella `fridge`
 --
 ALTER TABLE `fridge`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT per la tabella `users`

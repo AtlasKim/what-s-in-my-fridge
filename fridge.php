@@ -34,29 +34,49 @@
         if(empty($_POST['scadenza']))                       //l'unico campo che non viene inserito automaticamente è la scadenza
             $error.="Inserire il campo scadenza<br>";
         //metodo inserimento cibo
+        else if(empty($_POST['quantity']) && empty($_POST['gram']))     //se non sono stati inseriti entrambi i campi ritorna errore
+            $error.="Inserire una tra quantità o grammi<br>";
         else if($_POST['alimenti']!="empty")
         {
             //inserisci il cibo preso dal menù a tendina nella tabella contains
             if(checkContainedFood(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['scadenza'])==true)             //Se l'alimento è già presente in frigo e ha quella stessa data di scadenza allora aggiornare la quantità (sommandola)
             {
-                updateContainedFoodQuantity(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['quantity'],$_POST['scadenza']);
+                if(getContainedFoodQuantity(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['scadenza'])!=NULL && $_POST['quantity']!=NULL)   //controlla se l'alimento già presente era salvato in grammi o in quantità
+                    updateContainedFoodQuantity(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['quantity'],$_POST['scadenza']);
+                else if (getContainedFoodGram(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['scadenza'])!=NULL && $_POST['gram']!=NULL)
+                    updateContainedFoodGram(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['gram'],$_POST['scadenza']);
+                else
+                    $error.="Campo quantità/grammi non adatto al tipo di cibo già inserito, prego riprovare<br>";
+
             }
             else
-                insert_food_fridge(getFoodId($_POST['alimenti']),$_POST['quantity'],$_POST['scadenza'],$_SESSION["fridge"]);
-        }else if($_POST['alimenti']=="empty" && !empty($_POST['other_food']))                                                 //inserisci il nuovo cibo nel database food se non era già presente e dopo inseriscilo nella tabella contains 
-        {
+            {
+                if (isset($_POST['quantity_selected']))                                                                          //controlli necessari a capire se sono stati settati i grammi o la quantità
+                    insert_food_fridge_quantity(getFoodId($_POST['alimenti']),$_POST['quantity'],$_POST['scadenza'],$_SESSION["fridge"]);
+                else if(isset(($_POST['gram_selected'])))
+                    insert_food_fridge_gram(getFoodId($_POST['alimenti']),$_POST['gram'],$_POST['scadenza'],$_SESSION["fridge"]);
+            }
+                
+        }else if($_POST['alimenti']=="empty" && !empty($_POST['other_food'])){                                                 //inserisci il nuovo cibo nel database food se non era già presente e dopo inseriscilo nella tabella contains 
             if(checkFood($_POST['other_food'])==false)
             {
                 insert_food_db($_POST['other_food']);
             }else if (checkFood($_POST['other_food'])==true)
             {
-                insert_food_fridge(getFoodId($_POST['other_food']),$_POST['quantity'],$_POST['scadenza'],$_SESSION["fridge"]);
+                if (isset($_POST['quantity_selected']))                                                                          //controlli necessari a capire se sono stati settati i grammi o la quantità
+                    insert_food_fridge_quantity(getFoodId($_POST['alimenti']),$_POST['quantity'],$_POST['scadenza'],$_SESSION["fridge"]);
+                else if(isset(($_POST['gram_selected'])))
+                    insert_food_fridge_gram(getFoodId($_POST['alimenti']),$_POST['gram'],$_POST['scadenza'],$_SESSION["fridge"]);
             }        
-            else
-                $error.="Campo altro cibo vuoto, selezionarne uno dal menù a tendina o inserirne uno nuovo<br>";
         }
-        echo $error;
-        echo "Inserimento avvenuto con successo!<br>";
+        else
+        {
+            $error.="Campo altro cibo vuoto, selezionarne uno dal menù a tendina o inserirne uno nuovo<br>";
+            echo $error;
+        }
+
+        
+        //echo "Inserimento avvenuto con successo!<br>";
     }
     ?>
 
@@ -94,8 +114,12 @@
                     <label for="alimenti">Tipo di alimento</label>
                     <select id="alimenti" name="alimenti"></select>                                  <!-- Inserire le quantità -->
                     <input type="text" placeholder="Altro" name ="other_food"/>
+                    <input type="radio" id="quantity_selected" name="quantity_selected">
                     <label for="quantity">Quantità:</label>
-                    <input type="number" id="quantity" name="quantity" min = "1" value ="1"/>
+                    <input type="number" id="quantity" name="quantity" min = "1"/>
+                    <input type="radio" id="gram_selected" name="gram_selected">
+                    <label for="gram">Grammi:</label>             
+                    <input type="number" id="gram" name="gram" step= 50 min = "0"/>
                     <label for="date">Data di scadenza:</label>
                     <input type="date" name="scadenza" required/>                       <!-- Required fa si che non possa accettare l'input senza l'inserimento della data -->
                     <input type="submit" value="Inserisci cibo" name="insert_food"/>

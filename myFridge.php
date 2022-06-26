@@ -29,6 +29,7 @@
                 <tr>
                     <th>Nome alimento</th>
                     <th>Quantità</th>
+                    <th>Grammi</th>
                     <th>Data di scadenza</th>
                 </tr>
                 <tr>
@@ -47,21 +48,21 @@
                     for(let i = 0; i<food.length; i++)
                     {
                         const tr = food_table.insertRow();
-                        for(let j=0;j<3;j++)
+                        for(let j=0;j<4;j++)
                         {
                             let td = tr.insertCell();                               //provare a usare questa funzione per dare a ogni pulsante di cancellazione l'id del cibo corrispondente
                             td.innerHTML = food[i][j];                              //aggiunge al datalist dinamicamente tutte le opzioni presenti nel database
                         }
                         
                         let status = tr.insertCell();
-                        let emoji = emoji_status(food[i][2]);
+                        let emoji = emoji_status(food[i][3]);
                         status.innerHTML = emoji;
 
                         var button = document.createElement('button');
                         
                         button.name = "cancel_food";                                //scoprire come dare l'input a PHP per passare l'id dell'alimento da cancellare tramite la funzione
                         button.type = "submit";
-                        button.value = food[i][3];                                 //prende l'id e la data di scadenza corrispondente all'alimento in questione
+                        button.value = food[i][4];                                 //prende l'id e la data di scadenza corrispondente all'alimento in questione
                         button.innerHTML = "Cancella alimento";
                         tr.appendChild(button);                                    //crea automaticamente le righe contenenti i vari alimenti
                                                                                 //inserire qui pulsante per la cancellazione dell'oggetto in questione dalla tabella contain

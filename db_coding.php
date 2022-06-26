@@ -207,13 +207,26 @@ function insert_food_db($food_name)                                         //fu
     }
 }
 
-function insert_food_fridge($id_alimento,$quantity,$scadenza,$id_fridge)        //funzione che inserisce il cibo nella tabella contains
+function insert_food_fridge_quantity($id_alimento,$quantity,$scadenza,$id_fridge)        //funzione che inserisce il cibo nella tabella contains
 {
     try{
         $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $stmt = $conn->prepare("INSERT INTO contain (id_frigo,id_cibo,quantita,data_scadenza) VALUES (?,?,?,?)");
         $stmt->execute([$id_fridge,$id_alimento,$quantity,$scadenza]);          //probabilmente non sta inserendo la data di scadenza
+        return array("OK");
+    }catch(PDOException $e){
+        return array("KO", "Inserimento cibo nel frigo non riuscito");
+    }
+}
+
+function insert_food_fridge_gram($id_alimento,$gram,$scadenza,$id_fridge)        //funzione che inserisce il cibo nella tabella contains
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("INSERT INTO contain (id_frigo,id_cibo,grammi,data_scadenza) VALUES (?,?,?,?)");
+        $stmt->execute([$id_fridge,$id_alimento,$gram,$scadenza]);          //probabilmente non sta inserendo la data di scadenza
         return array("OK");
     }catch(PDOException $e){
         return array("KO", "Inserimento cibo nel frigo non riuscito");
@@ -275,7 +288,7 @@ function getContainedFood($id_fridge)
     try{
         $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("SELECT nome_cibo, quantita, data_scadenza,id_riga FROM food INNER JOIN contain ON food.id = contain.id_cibo WHERE id_frigo = ? ORDER BY data_scadenza");       //inner join per ottenere tutti i dati relativi al cibo contenuto nel frigo
+        $stmt = $conn->prepare("SELECT nome_cibo, quantita, grammi, data_scadenza,id_riga FROM food INNER JOIN contain ON food.id = contain.id_cibo WHERE id_frigo = ? ORDER BY data_scadenza");       //inner join per ottenere tutti i dati relativi al cibo contenuto nel frigo
         $stmt->execute([$id_fridge]);
         $res = $stmt->fetchAll();                  //estrae il risultato della query
         
@@ -330,6 +343,24 @@ function getContainedFoodQuantity($id_food,$id_fridge,$expire_date)
     }
 }
 
+function getContainedFoodGram($id_food,$id_fridge,$expire_date)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT grammi FROM contain WHERE id_cibo = ? AND id_frigo = ? AND data_scadenza = ?");       //questa funzione ritorna la quantità di un determinato alimento con una determinata data di scadenza
+        $stmt->execute([$id_food,$id_fridge,$expire_date]);
+        $res = $stmt->fetch();                  
+        
+        if($res !=null)
+            return $res;  
+        else
+            return NULL;
+    }catch(PDOException $e){
+        return NULL;
+    }
+}
+
 
 function getContainedFoodExpirationDate($id_food,$id_fridge)
 {
@@ -356,6 +387,25 @@ function updateContainedFoodQuantity($id_food,$id_fridge,$quantity,$expire_date)
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $stmt = $conn->prepare("UPDATE contain SET quantita = quantita + ? WHERE id_cibo = ? AND id_frigo = ? AND data_scadenza = ?");       //questa funzione ritorna la data di scadenza di un cibo inserito nel database, utilizzando l'id del frigo e del cibo
         $stmt->execute([$quantity,$id_food,$id_fridge,$expire_date]);
+        $res = $stmt->fetch();                  
+        
+        if($res !=null)
+            return true;  
+        else
+            return NULL;
+    }catch(PDOException $e){
+        return NULL;
+    }
+}
+
+
+function updateContainedFoodGram($id_food,$id_fridge,$gram,$expire_date)
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("UPDATE contain SET grammi = grammi + ? WHERE id_cibo = ? AND id_frigo = ? AND data_scadenza = ?");       //questa funzione ritorna la data di scadenza di un cibo inserito nel database, utilizzando l'id del frigo e del cibo
+        $stmt->execute([$gram,$id_food,$id_fridge,$expire_date]);
         $res = $stmt->fetch();                  
         
         if($res !=null)

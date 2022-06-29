@@ -1,5 +1,5 @@
 form {
-    background-color: #3333FF;
+    background-color: #0059B3;
     align-items: center;
     border-radius: 20px;
     box-sizing: border-box;
@@ -31,14 +31,15 @@ form {
 .link {
     color: white;
     position: relative;
-    top: 120px;             /*Misurazioni fatte manualmente*/
-    left: 18px; 
+    top: 100px;             /*Misurazioni fatte manualmente*/
+    left: 20px; 
+    margin-bottom: 10px;
 }
 
-h2 {
+h3 {
+    font-family: 'Exo 2', sans-serif;
     text-align: center;
     color: white;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 36px;
     font-weight: 600;
     margin-top: 30px;

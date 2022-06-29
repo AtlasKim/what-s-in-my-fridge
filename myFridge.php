@@ -7,7 +7,6 @@
     require 'config/db_config.php';
 
 
-
     if(isset(($_POST['new_fridge']))){                                  //se è stata selezionata l'opzione nuovo frigo allora crea un nuovo frigo collegato all'account
         $op = createFridge($_SESSION["user"]);
         if($op[0] == 'OK')
@@ -87,24 +86,29 @@
 ?>
 
 <?php
+    include "navbar.html";
+
     if (!isset($_SESSION["fridge"]))
     {
     ?>
         <html>
             <head>
+                <link rel="stylesheet" href="fridge.css"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1">  <!--Serve per fare scalare la grandezza della schermata in base al dispositivo-->
                 <title>Frigo utente</title>
             </head>
 
             <body>
-                <h2>Area My Fridge</h2>
+                <div>
+                    <h1>Area My Fridge</h1>
+                    <div id = "message"></div>
 
-                <div id = "message"></div>
-
-                <form method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">
-                    <input type="submit" value="Crea nuovo frigo" name="new_fridge"/>
-                    <input type="text" placeholder="Codice frigo" name ="id_fridge"/>
-                    <input type="submit" value="Codice frigo" name="old_fridge"/>
-                </form>
+                    <form class="form-inline" method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">
+                        <button class="form-button" type="submit" value="Crea nuovo frigo" name="new_fridge">Crea nuovo frigo</button>
+                        <input type="text" placeholder="Codice frigo" name ="id_fridge"/>
+                        <button class="form-button" type="submit" value="Codice frigo" name="old_fridge">Ricerca</button>
+                    </form>
+                </div>
             </body>    
         </html><?php
     }
@@ -112,56 +116,61 @@
     {?>
         <html>
             <head>
+                <link rel="stylesheet" href="fridge.css"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1">  <!--Serve per fare scalare la grandezza della schermata in base al dispositivo--> 
                 <title>Frigo utente</title>
             </head>
 
             <body>
                 <h2>Area My Fridge</h2>
 
-                <form method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">
-                    <label for="alimenti">Tipo di alimento</label>
-                    <select id="alimenti" name="alimenti"></select>                                  <!-- Inserire le quantità -->
-                    <input type="text" placeholder="Altro" name ="other_food"/>
-                    <input type="radio" id="quantity_selected" name="selected" value="quantity_selected">
-                    <label for="quantity">Quantità:</label>
-                    <input type="number" id="quantity" name="quantity" min = "1"/>
-                    <input type="radio" id="gram_selected" name="selected" value="gram_selected">
-                    <label for="gram">Grammi:</label>             
-                    <input type="number" id="gram" name="gram" step= 50 min = "0"/>
-                    <label for="date">Data di scadenza:</label>
-                    <input type="date" name="scadenza" required/>                       <!-- Required fa si che non possa accettare l'input senza l'inserimento della data -->
-                    <input type="submit" value="Inserisci cibo" name="insert_food"/>
-
-                    <script>
-                        <?php 
-                            $foods = json_encode(getFood());                //la funzione restituisce l'array contenente tutti i cibi ma è codificato in PHP, usiamo json_encode per fare la conversione
-                            echo "const food = ". $foods . ";\n";           //usiamo echo per dichiarare l'array in javascript
-                        ?>
-        
-                        var food_list = document.getElementById('alimenti');
-
-                        var option = document.createElement('option');
-                        option.value = "empty";                               
-                        option.text = "--";
-                        food_list.appendChild(option); 
-
-                        for(let i = 0; i<food.length; i++){                 //inserisce dinamicamente le opzioni di tutti i cibi già presenti nel database
-                            var option = document.createElement('option');  //crea l'opzione
-                            option.value = food[i];                         //il valore dell'opzione sarà corrispondente al nome dei cibi      
-                            option.text = food[i];                          //così come il testo al suo interno
-                            food_list.appendChild(option);                  //aggiunge al datalist dinamicamente tutte le opzioni presenti nel database
-                        }
-                    </script>        
-                </form>
+                <div class="second-div">
+                    <form class="add-food"method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">
+                        <label for="alimenti"><b>Tipo di alimento:</b></label>
+                        <select id="alimenti" name="alimenti"></select>                                  <!-- Inserire le quantità -->
+                        <input type="text" placeholder="Altro" name ="other_food"/>
+                        <input type="radio" id="quantity_selected" name="selected" value="quantity_selected">
+                        <label for="quantity"><b>Quantità:</b></label>
+                        <input type="number" id="quantity" name="quantity" min = "1"/>
+                        <input type="radio" id="gram_selected" name="selected" value="gram_selected">
+                        <label for="gram"><b>Grammi:</b></label>             
+                        <input type="number" id="gram" name="gram" step= 50 min = "0"/>
+                        <label for="date"><b>Data di scadenza:</b></label>
+                        <input type="date" name="scadenza" required/>                       <!-- Required fa si che non possa accettare l'input senza l'inserimento della data -->
+                        <!--<input type="submit" value="Inserisci cibo" name="insert_food"/>-->
+                        <button class="form-button" type="submit" value="Inserisci alimento" name="insert_food">Inserisci alimento</button>
+                        <script>
+                            <?php 
+                                $foods = json_encode(getFood());                //la funzione restituisce l'array contenente tutti i cibi ma è codificato in PHP, usiamo json_encode per fare la conversione
+                                echo "const food = ". $foods . ";\n";           //usiamo echo per dichiarare l'array in javascript
+                            ?>
             
+                            var food_list = document.getElementById('alimenti');
 
-                <form method="get" id="bottoni" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">       <!--Serve per inserire i pulsanti all'interno della tabella-->
-                    <table id="frigo" style="width:100%">
+                            var option = document.createElement('option');
+                            option.value = "empty";                               
+                            option.text = "--";
+                            food_list.appendChild(option); 
+
+                            for(let i = 0; i<food.length; i++){                 //inserisce dinamicamente le opzioni di tutti i cibi già presenti nel database
+                                var option = document.createElement('option');  //crea l'opzione
+                                option.value = food[i];                         //il valore dell'opzione sarà corrispondente al nome dei cibi      
+                                option.text = food[i];                          //così come il testo al suo interno
+                                food_list.appendChild(option);                  //aggiunge al datalist dinamicamente tutte le opzioni presenti nel database
+                            }
+                        </script>        
+                    </form>
+                </div>            
+                
+                <form class="table-form" method="get" id="bottoni" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">       <!--Serve per inserire i pulsanti all'interno della tabella-->
+                    <table id="frigo">
                         <tr>
-                            <th>Nome alimento</th>
+                            <th>Alimento</th>
                             <th>Quantità</th>
-                            <th>Grammi</th>
+                            <th>Peso (grammi)</th>
                             <th>Data di scadenza</th>
+                            <th>Status</th>
+                            <th></th>
                         </tr>
                         <tr>
                         </tr>
@@ -194,10 +203,11 @@
 
                                 var button = document.createElement('button');
                                 
+                                button.className = "table-button";
                                 button.name = "cancel_food";                                //scoprire come dare l'input a PHP per passare l'id dell'alimento da cancellare tramite la funzione
                                 button.type = "submit";
                                 button.value = food_fridge[i][4];                                 //prende l'id e la data di scadenza corrispondente all'alimento in questione
-                                button.innerHTML = "Cancella alimento";
+                                button.innerHTML = "Cancella";
                                 tr.appendChild(button);                                    //crea automaticamente le righe contenenti i vari alimenti
                                                                                         //inserire qui pulsante per la cancellazione dell'oggetto in questione dalla tabella contain
                             }

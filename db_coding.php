@@ -14,10 +14,11 @@ function logged($user,$psw)
     try{
         $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("SELECT email FROM users where email = ? and password = ?");
-        $stmt->execute([$user,$psw]);
+        $stmt = $conn->prepare("SELECT password FROM users WHERE email = ?");
+        $stmt->execute([$user]);
         $res = $stmt->fetch();
-        if($res!= null)
+        $decoded_psw = password_verify($psw,$res["password"]);
+        if($decoded_psw == true)
             return true;
     }catch(PDOException $e){
         return false;
@@ -32,11 +33,12 @@ function checkpassword($user,$psw)
         try{
             $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $stmt = $conn->prepare("SELECT password FROM users where email = ?");
+            $stmt = $conn->prepare("SELECT password FROM users WHERE email = ?");
             $stmt->execute([$user]);
             $user_psw = $stmt->fetch();
-            if($psw == $user_psw["password"])
-                return array("OK");
+            $decoded_psw = password_verify($psw,$user_psw["password"]);  //decodifica la password durante le operazioni di controllo
+            if($decoded_psw == true)
+                return true;
             else
                 return false;
         }catch(PDOException $e){
@@ -57,7 +59,7 @@ function changepassword($user,$psw)
         try{
             $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $stmt = $conn->prepare("UPDATE users SET password = ? where email = ?");
+            $stmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
             $stmt->execute([$psw,$user]);
             return array("OK");
         }catch(PDOException $e){

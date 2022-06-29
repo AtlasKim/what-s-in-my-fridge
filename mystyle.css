@@ -1,7 +1,8 @@
 body { 
-	background-color: rgba(28,110,164,0.48);
+	background-color: #80BFFF;
 	margin: 0;
-	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-weight: 500;
 }
 
 ul {
@@ -40,8 +41,8 @@ li.split
 li a.split
 {
 	
-	background-color: #4D88FF;
-	color: black;
+	background-color: #0059B3;
+	color: white;
 	
 }
 
@@ -96,3 +97,10 @@ li.dropdown {
    	color: white;
  	text-align: center;
 }
+
+.link-footer {
+    color: white;
+    position: relative;
+	right: 20px;
+}
+

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Giu 26, 2022 alle 12:04
+-- Creato il: Giu 29, 2022 alle 16:19
 -- Versione del server: 10.4.24-MariaDB
 -- Versione PHP: 8.1.6
 
@@ -41,10 +41,13 @@ CREATE TABLE `contain` (
 --
 
 INSERT INTO `contain` (`id_frigo`, `id_cibo`, `quantita`, `grammi`, `data_scadenza`, `id_riga`) VALUES
-(18, 14, 2, NULL, '2022-06-27', 19),
-(18, 10, NULL, 500, '2022-07-01', 20),
-(18, 13, 4, NULL, '2022-06-26', 21),
-(18, 3, 20, NULL, '2022-07-09', 22);
+(18, 14, 12, NULL, '2022-07-08', 29),
+(19, 3, 12, NULL, '2022-07-02', 31),
+(19, 10, NULL, 5000, '2022-07-09', 32),
+(18, 3, 6, NULL, '2022-07-08', 33),
+(19, 12, 3, NULL, '2022-07-10', 34),
+(19, 14, 4, NULL, '2022-06-29', 35),
+(18, 1, NULL, 600, '2022-07-09', 36);
 
 -- --------------------------------------------------------
 
@@ -102,7 +105,7 @@ INSERT INTO `fridge` (`id`, `marca`, `modello`) VALUES
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `email` varchar(50) DEFAULT NULL,
-  `password` varchar(50) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `id_fridge` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -111,9 +114,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `id_fridge`) VALUES
-(1, 'eri.07@hotmail.it', 'Fuffi', 19),
-(2, 'xxatlas98xx@gmail.com', 'Sunny', 18),
-(3, 'carmelo98.trifiro@gmail.com', '151823428sS', 18);
+(12, 'crashsum41@gmail.com', '$2y$10$fFlVR5gxGDwxihNnr6y.lO2qg/CoDdGOspC2gXz5KgKg/w5WcrnPW', NULL),
+(13, 'xxatlas98xx@gmail.com', '$2y$10$umwIpiN7ITcOY1qEVVFBk.V9FYs4MBFuc4Y5/PLKv7lhBGASSFBOa', 18),
+(14, 'carmelo98.trifiro@gmail.com', '$2y$10$13HIfgKotXKdpGSYrrWsD.piSaV9Eo4EHatR.NDr1lQ9EaWeUn2/m', 18),
+(15, 'xxatlas98xx@gmail.com', '$2y$10$M0YPWb6OHp9cNIQCTus/reKu5CdbvIjD3i80wGwJ3gOEZezhPLInm', 18);
 
 --
 -- Indici per le tabelle scaricate
@@ -154,7 +158,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT per la tabella `contain`
 --
 ALTER TABLE `contain`
-  MODIFY `id_riga` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_riga` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT per la tabella `food`
@@ -172,7 +176,7 @@ ALTER TABLE `fridge`
 -- AUTO_INCREMENT per la tabella `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- Limiti per le tabelle scaricate

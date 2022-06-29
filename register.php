@@ -41,7 +41,8 @@
 
         if(clearInput($_POST['password']) == clearInput($_POST['password_cmp']))
         {
-            $op = register(clearInput($_POST['email']),clearInput($_POST['password']));
+            $encoded_psw = password_hash(clearInput($_POST['password']), PASSWORD_DEFAULT);           //codifica la password e la inserisce nel database
+            $op = register(clearInput($_POST['email']),$encoded_psw);
             if($op[0] == 'OK'){
                 $_SESSION['user'] = $_POST['email'];
             }else{
@@ -60,16 +61,25 @@
     ?>
         <html>
             <head>
-            <title>Registrazione</title>
+                <link rel="stylesheet" href="formtype.css">
+                <meta name="viewport" content="width=device-width, initial-scale=1">  <!--Serve per fare scalare la grandezza della schermata in base al dispositivo-->
+                <title>Registrazione</title>
             </head>
             <body>
-            <h2>Registrazione</h2>
-            <form method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">   <!-- usiamo il metodo post per la sicurezza, per lo stesso motivo utilizziamo il metodo htmlspecialchars -->
-                Email <br> <input type="email" name="email"/> <br>
-                Password <br> <input type="password" name="password"/> <br>
-                Conferma Password <br> <input type="password" name="password_cmp"/> <br>
-                <br> <input type="submit" value="Registrati" name ="register"/>
-            </form>
+                <?php
+                    include "navbar.html"
+                ?>
+                
+                <form method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">   <!-- usiamo il metodo post per la sicurezza, per lo stesso motivo utilizziamo il metodo htmlspecialchars -->
+                    <h3>Registrazione</h3>
+                    <label for="email">Email</label><br>
+                    <input type="email" name="email"/><br>
+                    <label for="password">Password</label><br>
+                    <input type="password" name="password"/><br>
+                    <label for="password">Conferma Password</label><br>
+                    <input type="password" name="password_cmp"/> <br>
+                    <button type="submit" class="btn" value="Registrati" name ="register">REGISTRATI</button>
+                </form>
             </body>
         </html>
     <?php

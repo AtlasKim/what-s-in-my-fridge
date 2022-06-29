@@ -1,23 +1,16 @@
-<?php
-    $alimento = "carciofi";
-    $curl= curl_init();
-    curl_setopt($curl, CURLOPT_URL, 'http://www.google.com/search?q=ricette+'.$alimento.'');
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-    $result = curl_exec($curl);
-    curl_close($curl);
-
-    echo $result;
-?>
-
 <html>
-<body>
-    <div id="link">
-    </div>
-</body>
+    <body>
 
-<script>
-    g
-</script>
+        <p>
+            <a id="link" href="https://www.w3schools.com"></a>
+        </p>
+        
+    </body>
+
+    <script>
+        let alimento = "cioccolato";
+        const element = document.getElementById("link");
+        element.innerHTML = "Per ricette con "+alimento+" clicca qui!";
+        element.href = "http://www.google.com/search?q=ricette+"+alimento;
+    </script>
 </html>

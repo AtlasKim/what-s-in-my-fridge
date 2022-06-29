@@ -42,9 +42,9 @@
             //inserisci il cibo preso dal menù a tendina nella tabella contains
             if(checkContainedFood(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['scadenza'])==true)             //Se l'alimento è già presente in frigo e ha quella stessa data di scadenza allora aggiornare la quantità (sommandola)
             {
-                if(getContainedFoodQuantity(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['scadenza'])!=NULL && $_POST['quantity']!=NULL)   //controlla se l'alimento già presente era salvato in grammi o in quantità
+                if((getContainedFoodQuantity(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['scadenza'])!=NULL && $_POST['quantity']!=NULL) && $_POST['selected'] == "quantity_selected")   //controlla se l'alimento già presente era salvato in grammi o in quantità
                     updateContainedFoodQuantity(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['quantity'],$_POST['scadenza']);
-                else if (getContainedFoodGram(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['scadenza'])!=NULL && $_POST['gram']!=NULL)
+                else if ((getContainedFoodGram(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['scadenza'])!=NULL && $_POST['gram']!=NULL) && $_POST['selected'] == "gram_selected")
                     updateContainedFoodGram(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['gram'],$_POST['scadenza']);
                 else
                     $error.="Campo quantità/grammi non adatto al tipo di cibo già inserito, prego riprovare<br>";
@@ -139,6 +139,7 @@
                         <input type="date" name="scadenza" required/>                       <!-- Required fa si che non possa accettare l'input senza l'inserimento della data -->
                         <!--<input type="submit" value="Inserisci cibo" name="insert_food"/>-->
                         <button class="form-button" type="submit" value="Inserisci alimento" name="insert_food">Inserisci alimento</button>
+                        <button class="form-button" type="submit" value="Modifica quantità alimento" name="modify_food">Modifica quantità</button>
                         <script>
                             <?php 
                                 $foods = json_encode(getFood());                //la funzione restituisce l'array contenente tutti i cibi ma è codificato in PHP, usiamo json_encode per fare la conversione

@@ -1,4 +1,6 @@
-form {
+/*CSS utilizzato nelle pagine di Login e Registrazione*/
+
+form {          /*Css per il form*/
     background-color: #0059B3;
     align-items: center;
     border-radius: 20px;
@@ -12,7 +14,7 @@ form {
     line-height: 1.5;
 }
 
-.btn {
+.btn {          /*Css per i button presenti all'interno del form*/
     background-color: #4D88FF;
     color: white;
     padding: 16px 20px;

@@ -1,3 +1,10 @@
+/*CSS esterno che gestisce il css per la navbar, per il footer e il body di ogni pagina del sito*/
+
+html {
+	overflow-y: scroll; 			/*Ci permette di scrollare la pagina in verticale*/
+	overflow-x: hidden;
+}
+
 body { 
 	background-color: #80BFFF;
 	margin: 0;
@@ -5,7 +12,7 @@ body {
 	font-weight: 500;
 }
 
-ul {
+ul {								/*Per implementare la navbar abbiamo utilizzato una lista puntata, con relativi elementi*/
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
@@ -33,7 +40,7 @@ li a:hover {
 	color: black;
 }
 
-li.split
+li.split							/*Abbiamo diviso la navbar in due parti per far risaltare il login e il signup, posti nella parte destra della navbar*/
 {
 	float: right;
 }
@@ -55,7 +62,7 @@ li.dropdown {
 	display: inline-block;
 }
   
-.dropdown-content {
+.dropdown-content {					/*Css relativo al menù a tendina visibile quando si passa il cursore del mouse su Profilo*/
 	display: none;
 	position: absolute;
 	background-color: #00264D;
@@ -87,10 +94,10 @@ li.dropdown {
 	color: black;
 }
 
-.footer {
+.footer {							/*Css relativo al footer*/
 	position: fixed;
    	left: 0;
-	height: 70px;
+	height: 90px;
    	bottom: 0;
    	width: 100%;
    	background-color: #00264D;
@@ -100,7 +107,6 @@ li.dropdown {
 
 .link-footer {
     color: white;
-    position: relative;
-	right: 20px;
 }
+
 

@@ -1,4 +1,6 @@
-.form-inline {  
+/*Css che gestisce la pagina del frigo, quindi il form per aggiungere o rimuovere gli alimenti dal frigo, quello per selezionare il frigo nel caso non ce ne sia uno e infine la tabella che rappresenta il frigo stesso*/
+
+.form-inline {           /* Gestisce il CSS del form per la creazione o l'aggiunta di un frigo, presente ad inizio pagina*/
     font-family: Tahoma, Geneva, sans-serif;
     align-items: center;
     align-self: center;
@@ -7,7 +9,6 @@
     margin-left: 47px;
     margin-bottom: 20px;
 }
- /* Gestisce il CSS del form per la creazione o l'aggiunta di un frigo, presente ad inizio pagina*/
 
 
 input {
@@ -20,7 +21,7 @@ input {
     border-radius: 24px;
 }
 
-.form-button {
+.form-button {      /*Stile dei tasti dei form che gestiscono la creazione del frigo e l'aggiunta di alimenti nel frigo*/
     font-family: Tahoma, Geneva, sans-serif;
     background-color: #0059B3;
     color: white;
@@ -36,9 +37,10 @@ button:hover {
 }
 
 
-table {
+table {  /*Rappresentazione del frigo*/
     border-collapse: collapse;
     width: 100%;
+    margin-bottom: 150px;
 }
 
 .table-button {
@@ -65,15 +67,6 @@ th {
     color: white;
 }
 
-
-button {
-    font-family: Tahoma, Geneva, sans-serif;
-    background-color: #4D88FF;
-    color: white;
-    border: none;
-    border-radius: 24px;
-    padding: 10px;
-}
 
 h1 {
     margin-left: 20px;  
@@ -102,5 +95,6 @@ h2 {
 .profile-2 {
     margin-right: 15px;
 }
+
 
 

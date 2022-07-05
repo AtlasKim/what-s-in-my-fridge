@@ -82,7 +82,6 @@ function register($user,$psw)
             $stmt = $conn->prepare("INSERT INTO users (email,password) VALUES (?,?)");
             $stmt->execute([$user,$psw]);
             return array("OK");
-            //return $res['email']!=null;
         }catch(PDOException $e){
             return array("KO", "La mail utilizzata appartiene a un altro account");
         } 
@@ -202,7 +201,7 @@ function insert_food_db($food_name)                                         //fu
         $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $stmt = $conn->prepare("INSERT INTO food (id,nome_cibo) VALUES (NULL, ?)");
-        $stmt->execute([$food_name]);
+        $stmt->execute([strtolower(clearInput($food_name))]);
         return array("OK");
     }catch(PDOException $e){
         return array("KO", "Inserimento cibo nel database non riuscito");
@@ -283,8 +282,7 @@ function getFoodId($alimento)
     }
 }
 
-//creare una funzione che restituisce il numero di alimenti all'interno di un determinato frigo
-//il select dovrebbe far ritornare tutte le informazioni degli alimenti contenuti al suo interno, quindi Nome, quantità e data di scadenza
+//il select ritorna tutte le informazioni degli alimenti contenuti al suo interno, quindi Nome, quantità e data di scadenza
 function getContainedFood($id_fridge)
 {
     try{
@@ -456,4 +454,21 @@ function clearContainedFood($id_row)
     }
 }
 
+function clearContainedFoodModify($id_food,$id_fridge,$expire_date) //funzione utilizzata quando proviamo a modificare un alimento e riduciamo la quantità sotto lo zero
+{
+    try{
+        $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("DELETE FROM contain WHERE id_cibo = ? AND id_frigo = ? AND data_scadenza = ?");       //dobbiamo utilizzare anche la data di scadenza per cancellare esattamente quell'alimento
+        $stmt->execute([$id_food,$id_fridge,$expire_date]);
+        $res = $stmt->fetch();                  
+        
+        if($res !=null)
+            return $res;  
+        else
+            return NULL;
+    }catch(PDOException $e){
+        return NULL;
+    }
+}
 ?>

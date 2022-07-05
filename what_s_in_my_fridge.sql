@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Giu 29, 2022 alle 16:19
+-- Creato il: Lug 05, 2022 alle 11:07
 -- Versione del server: 10.4.24-MariaDB
--- Versione PHP: 8.1.6
+-- Versione PHP: 7.4.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -41,13 +41,22 @@ CREATE TABLE `contain` (
 --
 
 INSERT INTO `contain` (`id_frigo`, `id_cibo`, `quantita`, `grammi`, `data_scadenza`, `id_riga`) VALUES
-(18, 14, 12, NULL, '2022-07-08', 29),
 (19, 3, 12, NULL, '2022-07-02', 31),
 (19, 10, NULL, 5000, '2022-07-09', 32),
-(18, 3, 6, NULL, '2022-07-08', 33),
 (19, 12, 3, NULL, '2022-07-10', 34),
 (19, 14, 4, NULL, '2022-06-29', 35),
-(18, 1, NULL, 600, '2022-07-09', 36);
+(18, 9, NULL, 150, '2022-07-15', 55),
+(18, 5, NULL, 350, '2022-07-14', 58),
+(18, 1, NULL, 500, '2022-07-03', 63),
+(18, 3, 6, NULL, '2022-07-09', 65),
+(18, 18, NULL, 200, '2022-07-06', 66),
+(18, 14, 12, NULL, '2022-07-10', 67),
+(18, 16, NULL, 500, '2022-07-15', 70),
+(18, 15, 4, NULL, '2022-07-14', 71),
+(18, 21, NULL, 100, '2022-07-09', 73),
+(18, 22, NULL, 200, '2022-07-10', 74),
+(18, 23, NULL, 150, '2022-07-16', 75),
+(18, 25, 3, NULL, '2022-07-03', 77);
 
 -- --------------------------------------------------------
 
@@ -73,7 +82,16 @@ INSERT INTO `food` (`id`, `nome_cibo`) VALUES
 (10, 'pesce spada'),
 (12, 'melanzane'),
 (13, 'carciofi'),
-(14, 'uova');
+(14, 'uova'),
+(15, 'hamburger'),
+(16, 'pesche'),
+(17, 'anguria'),
+(18, 'zucchine'),
+(19, 'anguria perla nera'),
+(21, 'salame'),
+(22, 'prosciutto cotto'),
+(23, 'speck'),
+(25, 'pinsa');
 
 -- --------------------------------------------------------
 
@@ -82,19 +100,18 @@ INSERT INTO `food` (`id`, `nome_cibo`) VALUES
 --
 
 CREATE TABLE `fridge` (
-  `id` int(11) NOT NULL,
-  `marca` varchar(50) NOT NULL,
-  `modello` varchar(50) NOT NULL
+  `id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dump dei dati per la tabella `fridge`
 --
 
-INSERT INTO `fridge` (`id`, `marca`, `modello`) VALUES
-(18, '', ''),
-(19, '', ''),
-(27, '', '');
+INSERT INTO `fridge` (`id`) VALUES
+(18),
+(19),
+(27),
+(28);
 
 -- --------------------------------------------------------
 
@@ -115,9 +132,11 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `email`, `password`, `id_fridge`) VALUES
 (12, 'crashsum41@gmail.com', '$2y$10$fFlVR5gxGDwxihNnr6y.lO2qg/CoDdGOspC2gXz5KgKg/w5WcrnPW', NULL),
-(13, 'xxatlas98xx@gmail.com', '$2y$10$umwIpiN7ITcOY1qEVVFBk.V9FYs4MBFuc4Y5/PLKv7lhBGASSFBOa', 18),
 (14, 'carmelo98.trifiro@gmail.com', '$2y$10$13HIfgKotXKdpGSYrrWsD.piSaV9Eo4EHatR.NDr1lQ9EaWeUn2/m', 18),
-(15, 'xxatlas98xx@gmail.com', '$2y$10$M0YPWb6OHp9cNIQCTus/reKu5CdbvIjD3i80wGwJ3gOEZezhPLInm', 18);
+(18, 'xxatlas98xx@gmail.com', '$2y$10$vFdATkJyewveJ7bQm8Xvs.JyPLrZthcUj4RR5.5qubSM2MwA.A6YG', 18),
+(19, 'eri.07@hotmail.it', '$2y$10$pK.l76BKqVDLQrI9K/y/KOVYpEWevHGAdsrObsHx/xdg1HtW/7msO', NULL),
+(21, 'mailprova@gmail.com', '$2y$10$bwZn70RAlQnlAlvQXO07jO/clKMmgCZHM8GlbfwihK4wzDSbK9sJC', 18),
+(22, 'xxatlas98xx@gmail.com', '$2y$10$dbVo4uPyMLbqHWZh9eyhVul49qMyF2tv0mQxhgQGHG2ctuw14okvi', 18);
 
 --
 -- Indici per le tabelle scaricate
@@ -158,25 +177,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT per la tabella `contain`
 --
 ALTER TABLE `contain`
-  MODIFY `id_riga` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id_riga` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT per la tabella `food`
 --
 ALTER TABLE `food`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT per la tabella `fridge`
 --
 ALTER TABLE `fridge`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT per la tabella `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Limiti per le tabelle scaricate

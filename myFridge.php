@@ -132,12 +132,12 @@
         }
     }
 
-    if(isset($_GET["cancel_food"]))
+    /*if(isset($_GET["cancel_food"]))
     {
         clearContainedFood($_GET["cancel_food"]);      //cancella l'alimento selezionato tramite bottoni, poi fare l'unset per evitare che resti settato
         unset($_GET["cancel_food"]);
         echo "<script>alert('Alimento cancellato con successo!');</script>";  
-    }
+    }*/
 
 ?>
 
@@ -175,6 +175,85 @@
                 <link rel="stylesheet" href="fridge.css"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1">  <!--Serve per fare scalare la grandezza della schermata in base al dispositivo--> 
                 <title>Frigo utente</title>
+
+
+                <script>
+                    //window.onload = showFood();
+                    window.addEventListener("load",bindEvents);
+                    //window.addEventListener("load",showFood);
+                    
+                    
+                    
+
+                    function bindEvents()
+                    {
+                        //document.getElementByClassName("table-button").addEventListener("click", foodDelete);
+
+
+                        function foodDelete(id_row)
+                        {
+                            var oReq = new XMLHttpRequest();
+                            oReq.onload = function(){
+                                /*alert('Alimento cancellato con successo!');*/
+                            };
+                            oReq.open("delete", "api.php/contain/" + id_row, true);
+                            oReq.send();
+                        }
+
+                        this.onload = showFood();
+                        function showFood()
+                        {
+                            <?php
+                                $id_frigo = json_encode($_SESSION["fridge"]);
+                                echo "const fridge = ".$id_frigo. ";\n";
+                            ?>
+
+                            var oReq = new XMLHttpRequest();                            //apertura richiesta HTTP
+                            oReq.onload = function(){
+                                
+                                var food_fridge = JSON.parse(oReq.responseText);        //funzione per convertire in array JSON la risposta
+                                console.log(food_fridge);
+                                var food_table = document.getElementById('frigo');
+
+                                for(let i = 0; i<food_fridge.length; i++)
+                                {
+                                    const tr = food_table.insertRow();
+                                    for(let j=1;j<=6;j++)
+                                    {
+                                        if(j!=2 & j!=3)                     //non ci servono quindi non li stampiamo a schermo
+                                        {
+                                            let td = tr.insertCell();                               
+                                            if(j==5 && food_fridge[i][j])
+                                                td.innerHTML = food_fridge[i][j]+"g";                              //se l'alimento è salvato in grammi allora stampa la g alla fine
+                                            else if(j==6)
+                                                td.innerHTML = food_fridge[i][j].split("-").reverse().join("-");        //modifica il formato della data da YYYY-MM-DD a DD-MM-YYYY
+                                            else
+                                                td.innerHTML = food_fridge[i][j];
+                                        }
+                                    }
+                                        
+                                    let status = tr.insertCell();                                               //dopo aver stampato tutte le informazioni allora aggiunge lo status alla riga corrispondente al cibo
+                                    let emoji = emoji_status(food_fridge[i][6]);
+                                    status.innerHTML = emoji;
+
+                                    var button = document.createElement('button');
+                                        
+                                    button.className = "table-button";
+                                    button.name = "cancel_food";                                //Crea il bottone di cancellazione dell'alimento
+                                    button.type = "submit";
+                                    button.value = food_fridge[i][7];                           //il valore è corrispondente all'id della riga della tabella contain per il bottone
+                                    button.innerHTML = "Cancella";
+                                    button.onclick = foodDelete(this.value);
+                                    tr.appendChild(button);                                    //crea automaticamente le righe contenenti i vari alimenti
+                                                                
+                                }
+                                    //document.getElementById("ajaxres").innerHTML = oReq.responseText;
+                            };
+                            oReq.open("get", "api.php/contain/"+ fridge, true);
+                            oReq.send(); //dovrebbe permetterci di inviare l'id del frigo attualmente utilizzato altrimenti usare l'esempio sotto
+                        }
+                    }
+                </script>
             </head>
 
             <body>
@@ -241,7 +320,13 @@
                                 echo "const jid_food =". $id_food . ";\n";
                             ?>
 
-                            var food_table = document.getElementById('frigo');
+                            //const food_fridge = document.getElementById("ajaxres").innerHTML;
+
+                            //console.log(food_fridge);
+
+                            //document.getElementById("prova").innerHTML= food_fridge;
+
+                            /*var food_table = document.getElementById('frigo');
 
                             for(let i = 0; i<food_fridge.length; i++)
                             {
@@ -269,7 +354,7 @@
                                 tr.appendChild(button);                                    //crea automaticamente le righe contenenti i vari alimenti
                                                           
                             }
-
+                            */
                             function emoji_status(expiration_date) {
                                 const current_date = new Date();                                                //funzione che controlla la data di scadenza dell'alimento e restituisce uno status con colori differenti
                                 const exp_date = new Date(expiration_date);
@@ -287,6 +372,8 @@
                         </script>
                     </table>
                 </form>
+                <p id="ajaxres"></p>
+                <p id="prova"></p>
             </body>    
         </html><?php
     }?>

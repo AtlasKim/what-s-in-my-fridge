@@ -4,7 +4,7 @@
     $method = $_SERVER['REQUEST_METHOD'];
     $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
     $input = json_decode(file_get_contents('php://input'),true);
-
+    
     $conn = new PDO("mysql:host=".$GLOBALS['dbhost'].";dbname=".$GLOBALS['dbname'], $GLOBALS['dbuser'],$GLOBALS['dbpassword']);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $table = preg_replace('/[^a-z0-9_]+/i','',array_shift($request));
@@ -25,7 +25,10 @@
             $set.=($i>0?',':'').'`'.$columns[$i].'`=';
             $set.=($values[$i]===null?'NULL':'"'.$values[$i].'"');
         }
+      //echo("<script>console.log('".$set."');\n</script>");
     }
+
+    
 
     switch ($method) {
         case 'GET':
@@ -33,12 +36,16 @@
           $sql = "select * from ".($key? "food inner join $table on food.id = $table.id_cibo  WHERE id_frigo=".$key."" : "'$table'" )." order by data_scadenza";
           break;
         case 'PUT':
-          $sql = "update `$table` set $set where id_riga=\"$id\""; break;
+          $sql = "update `$table` set $set where id_riga=\"$key\""; 
+          break;
         case 'POST':
-          $sql = "insert into `$table` set $set"; break;
+          $sql = "insert into `$table` set $set"; 
+          break;
         case 'DELETE':
-          $sql = "delete from `$table` where id_riga=\"$key\""; break;
+          $sql = "delete from `$table` where id_riga=\"$key\""; 
+          break;
     }
+    
     try
     {
       $stmt = $conn->prepare($sql);

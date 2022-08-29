@@ -1,0 +1,61 @@
+/*CSS utilizzato nelle pagine di Login e Registrazione*/
+
+form {          /*Css per il form*/
+    background-color: #0059B3;
+    align-items: center;
+    border-radius: 20px;
+    box-sizing: border-box;
+    height: 500px;
+    padding: 20px;
+    width: 320px;
+    color: white;
+    margin: auto;
+    margin-top: 10%;
+    line-height: 1.5;
+}
+
+.btn {          /*Css per i button presenti all'interno del form*/
+    background-color: #4D88FF;
+    color: white;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom:10px;
+    opacity: 0.8;
+}
+
+.btn:hover {
+    opacity: 1;
+}
+
+.link {
+    color: white;
+    position: relative;
+    top: 100px;             /*Misurazioni fatte manualmente*/
+    left: 20px; 
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-family: 'Exo 2', sans-serif;
+    text-align: center;
+    color: white;
+    font-size: 36px;
+    font-weight: 600;
+    margin-top: 30px;
+}
+
+input {
+    align-self: center;
+    display: flex;
+    background-color: #198CFF;
+    border-radius: 24px;
+    border: 0;
+    box-sizing: border-box;
+    color: #eee;
+    font-size: 18px;
+    outline: 0;
+    padding: 8px 28px 0;
+}

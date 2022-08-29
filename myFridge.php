@@ -33,7 +33,7 @@
             
     }
 
-    if(isset (($_POST['insert_food'])))                     //Metodo per l'inserimento del cibo nella tabella
+    /*if(isset (($_POST['insert_food'])))                     //Metodo per l'inserimento del cibo nella tabella
     {   
         if(empty($_POST['scadenza']))                       //l'unico campo che non viene inserito automaticamente è la scadenza
             $error.="Inserire il campo scadenza<br>";
@@ -90,7 +90,7 @@
             $error.="Campo altro cibo vuoto, selezionarne uno dal menù a tendina o inserirne uno nuovo<br>";
             echo '<script type="text/javascript" >alert('.$error.');</script>';
         }
-    }
+    }*/
     /*else if(isset($_POST['modify_food']))               //se l'alimento deve essere modificato allora la sua quantità va ridotta
     {
         if(checkContainedFood(getFoodId($_POST['alimenti']),$_SESSION["fridge"],$_POST['scadenza'])==true)             //Se l'alimento è già presente in frigo e ha quella stessa data di scadenza allora aggiornare la quantità (sommandola)
@@ -181,21 +181,27 @@
                     window.onload = showFood(printFood);                             //DEFINIRE SEMPRE LA FUNZIONE DA CHIAMARE IN CALLBACK
                     //window.addEventListener("load",bindEvents);
                     //window.addEventListener("load",showFood);
+                    
 
                     function foodDelete(id_row)
                     {
                         var oReq = new XMLHttpRequest();
-                        oReq.onload = function(){alert('Alimento cancellato con successo!');};          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                        oReq.onload = function(){
+                            alert('Alimento cancellato con successo!');
+                            showFood(printFood);
+                        };          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
                         oReq.open("delete", "api.php/contain/" + id_row, true);                         //passa l'id della riga da cancellare nella tabella contain
                         oReq.send();
                     }
                     
-                    function modifyFood(oReq)
-                    {
-                        var food_fridge = JSON.parse(oReq);
+                    
 
+                    function modifyFood(food)
+                    {
+                        var food_fridge = JSON.parse(food);
+                        console.log("chiamata la funzione di modifica alimento");
                         let cibo = {};                                                                  //creaiamo un oggetto cibo da trasformare in stringa dopo durante la modifica
-                        let alimenti = document.getElementById("alimenti").value;                      //inseriamo all'interno delle variabili tutti i campi del form che ci possono servire
+                        cibo.id_cibo = document.getElementById("alimenti").value;                      //inseriamo all'interno delle variabili tutti i campi del form che ci possono servire
                         <?php
                             $id_frigo = json_encode($_SESSION["fridge"]);
                             echo "cibo.id_frigo = ".$id_frigo. ";\n";
@@ -207,50 +213,38 @@
                         cibo.data_scadenza = document.getElementById("scadenza").value;
 
                         
-
-
-                        /*console.log(food_fridge[0][1]);
-                                
-                        console.log(q_selected);
-                        console.log(g_selected);
-                        console.log(!cibo.quantita);
-                        console.log(!cibo.grammi);
-                        */
-
                         for(let i = 0; i<food_fridge.length; i++)
                         {
-                            /*console.log(food_fridge[i][1]);
-                            console.log(alimenti.toString() == food_fridge[i][1]);
-                            console.log(food_fridge[i][5]);
-                            console.log(food_fridge[i][4]);
-                            console.log(food_fridge[i][6] == cibo.data_scadenza);*/
-                            
-                            if((food_fridge[i][1] == alimenti.toString()) && food_fridge[i][6] == cibo.data_scadenza)
+                            if((food_fridge[i][0] == cibo.id_cibo) && food_fridge[i][6] == cibo.data_scadenza)          //se gli id corrispondono e la data di scadenza corrisponde possiamo modificare l'alimento
                             {
-                                cibo.id_cibo = food_fridge[i][0];
                                 console.log("Ho trovato l'alimento con la data di scadenza");
                                 if((food_fridge[i][5] != null && !cibo.grammi==false) && g_selected == true)          //se 
                                 {
                                     console.log("L'alimento era salvato in grammi e tu hai inserito i grammi da modificare");
-                                    console.log(food_fridge[i][7]);
+                                    cibo.quantita = null;
                                     var jsondata = JSON.stringify(cibo);
-                                    console.log(jsondata);
+                                    
 
                                     var oReq = new XMLHttpRequest();
-                                    oReq.onload = function(){alert('Alimento modificato con successo!');};          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
-                                    oReq.open("put", "api.php/contain/" + food_fridge[i][7], true); 
-                                                               
+                                    oReq.onload = function(){
+                                        alert('Alimento modificato con successo!');
+                                        showFood(printFood);
+                                    };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                                    oReq.open("put", "api.php/contain/" + food_fridge[i][7], true);                                            
                                     oReq.send(jsondata);
+                                    console.log(jsondata);
                                 }
                                 else if((food_fridge[i][4] != null && !cibo.quantita==false) && q_selected == true)
                                 {
                                     console.log("L'alimento era salvato in unità e tu hai inserito l'unità da modificare");
-                                    console.log(food_fridge[i][7]);
+                                    cibo.grammi = null;
                                     var jsondata = JSON.stringify(cibo);
 
                                     var oReq = new XMLHttpRequest();
-                                    console.log(jsondata);
-                                    oReq.onload = function(){alert('Alimento modificato con successo!');};          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                                    oReq.onload = function(){
+                                        alert('Alimento modificato con successo!');
+                                        showFood(printFood);
+                                    };          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
                                     oReq.open("put", "api.php/contain/" + food_fridge[i][7], true);                            
                                     oReq.send(jsondata);
                                 }
@@ -258,9 +252,112 @@
                                     alert("Dati incongruenti, prego rieffettuare correttamente la modifica");
                             }
                         }
+                        document.getElementById('form_insert').reset();
                     }
 
-                    //function foodInsert()
+                    
+                    function insertFood()
+                    {
+                        let cibo = {};   
+                                                                                               //creaiamo un oggetto cibo da trasformare in stringa dopo durante la modifica
+                        let alimenti = document.getElementById("alimenti").value;                      //inseriamo all'interno delle variabili tutti i campi del form che ci possono servire
+                        <?php
+                            $id_frigo = json_encode($_SESSION["fridge"]);
+                            echo "cibo.id_frigo = ".$id_frigo. ";\n";
+                        ?>
+                        let q_selected = document.getElementById("quantity_selected").checked;
+                        let g_selected = document.getElementById("gram_selected").checked;
+                        cibo.quantita = document.getElementById("quantity").value;
+                        cibo.grammi = document.getElementById("gram").value;
+                        cibo.data_scadenza = document.getElementById("scadenza").value;
+
+                        console.log(q_selected);
+                        console.log(g_selected);
+                                /*if (alimenti != null)
+                                {
+                                    food_fridge
+                                }*/
+                                
+                        if(alimenti != "empty" && cibo.data_scadenza)
+                        {
+                            cibo.id_cibo = alimenti;
+                            if(q_selected == true && !cibo.quantita==false)  //parte la richiesta AJAX con il POST e la quantità
+                            {
+                                cibo.grammi = null;
+                                var jsondata = JSON.stringify(cibo);
+                                        
+                                var oReq = new XMLHttpRequest();
+                                oReq.onload = function(){
+                                    alert('Alimento inserito con successo!');
+                                    showFood(printFood);
+                                };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                                oReq.open("post", "api.php/contain/", true);                                            
+                                oReq.send(jsondata);
+                                console.log(jsondata);
+                            }
+                                        
+                            else if(g_selected == true && !cibo.grammi==false) //parte la richiesta AJAX con il POST e i grammi
+                            {
+                                cibo.quantita = null;
+                                var jsondata = JSON.stringify(cibo);
+                                        
+                                var oReq = new XMLHttpRequest();
+                                oReq.onload = function(){
+                                    alert('Alimento inserito con successo!');
+                                    showFood(printFood);
+                                };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                                oReq.open("post", "api.php/contain/", true);                                            
+                                oReq.send(jsondata);
+                                console.log(jsondata);
+                            }
+                                        
+                        }
+                                
+                        else if(alimenti == "empty" && altri_alimenti !=null)
+                        {
+                            insertOptionFood(altri_alimenti);                 //deve inserire nella lista delle opzioni il nuovo alimento se non era già presente
+
+                            if(q_selected == true && !cibo.quantita==false)  //parte la richiesta AJAX con il POST e la quantità
+                            {
+                                cibo.grammi = null;
+                                var jsondata = JSON.stringify(cibo);
+                                        
+                                var oReq = new XMLHttpRequest();
+                                oReq.onload = function(){
+                                    alert('Alimento inserito con successo!');
+                                    showFood(printFood);
+                                };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                                oReq.open("post", "api.php/contain/", true);                                            
+                                oReq.send(jsondata);
+                                console.log(jsondata);
+                            }
+                                        
+                            else if(g_slected == true && !cibo.grammi==false) //parte la richiesta AJAX con il POST e i grammi
+                            {
+                                cibo.quantita = null;
+                                var jsondata = JSON.stringify(cibo);
+                                        
+                                var oReq = new XMLHttpRequest();
+                                oReq.onload = function(){
+                                    alert('Alimento inserito con successo!');
+                                    showFood(printFood);
+                                };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                                oReq.open("post", "api.php/contain/", true);                                            
+                                oReq.send(jsondata);
+                                console.log(jsondata);
+                            }
+                                        
+                        }
+
+                        else
+                        {
+                            alert("Errore durante l'inserimento dati");
+                        }
+
+                        document.getElementById('form_insert').reset();
+                    }
+
+
                     function showFood(callback)                    //sfruttiamo una funzione di callback chiamata print food
                     {
                         <?php
@@ -279,12 +376,14 @@
                     function printFood(oReq)
                     {
                         var food_fridge = JSON.parse(oReq);        //funzione per convertire in array JSON la risposta
-                        console.log(food_fridge);
+                        //console.log(food_fridge);
                         var food_table = document.getElementById('frigo');
+                        var table_body = document.getElementById('body');
+                        table_body.innerHTML = null;
 
                             for(let i = 0; i<food_fridge.length; i++)
                             {
-                                const tr = food_table.insertRow();
+                                const tr = table_body.insertRow();
                                 for(let j=1;j<=6;j++)
                                 {
                                     if(j!=2 & j!=3)                     //non ci servono quindi non li stampiamo a schermo
@@ -315,7 +414,53 @@
                                                                 
                             }
                                     //document.getElementById("ajaxres").innerHTML = oReq.responseText;
-                    }                   
+                    } 
+                    
+                    function getOptionFood(callback)                    //funzione atta ad ottenere le opzioni dei cibi già salvati nel database
+                    {
+                        var oReq = new XMLHttpRequest();                            //apertura richiesta HTTP
+                        oReq.onload = function(){
+                            callback(oReq.responseText);
+                        };
+                        oReq.open("get", "api.php/food/", true);
+                        oReq.send(); //dovrebbe permetterci di inviare l'id del frigo attualmente utilizzato altrimenti usare l'esempio sotto
+                    }
+
+                    function showOptionFood(oReq)
+                    {
+                        var food = JSON.parse(oReq)       //otteniamo la lista di opzioni nel database food
+                        console.log(food);
+                            
+                        var food_list = document.getElementById('alimenti');
+
+                        var option = document.createElement('option');
+                        option.value = "empty";                               
+                        option.text = "--";
+                        food_list.appendChild(option); 
+
+                        for(let i = 0; i<food.length; i++)
+                        {                 //inserisce dinamicamente le opzioni di tutti i cibi già presenti nel database
+                            var option = document.createElement('option');  //crea l'opzione
+                            option.value = food[i][0];                         //il valore dell'opzione sarà corrispondente al nome dei cibi      
+                            option.text = food[i][1];                          //così come il testo al suo interno
+                            food_list.appendChild(option);                  //aggiunge al datalist dinamicamente tutte le opzioni presenti nel database
+                        }
+                    }
+
+                    function insertOptionFood(food)                     //funzione atta a inserire un nuovo alimento nella tabella food
+                    {
+                        let opzioni = JSON.parse(food)
+
+                        let alimento = {};
+                        alimento.nome_cibo = document.getElementById("other_food");
+
+                        var jsondata = JSON.stringify(alimento);
+
+                        var oReq = new XMLHttpRequest();
+                        oReq.onload = function(){};
+                        oReq.open("post", "api.php/food/", true);
+                        oReq.send(jsondata);
+                    }
                 </script>
             </head>
 
@@ -323,7 +468,7 @@
                 <h2>Area My Fridge</h2>
 
                 <div class="second-div">                                        <!--Form di inserimento o modifica dell'alimento-->
-                    <form class="add-food"method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">
+                    <form class="add-food" id= "form_insert" method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">    <!--  -->
                         <label for="alimenti"><b>Tipo di alimento:</b></label>
                         <select id="alimenti" name="alimenti"></select>                                  <!-- Inserire le quantità -->
                         <input type="text" placeholder="Altro" name ="other_food" id="other_food"/>
@@ -336,15 +481,22 @@
                         <label for="date"><b>Data di scadenza:</b></label>
                         <input type="date" name="scadenza" id="scadenza" required/>                       <!-- Required fa si che non possa accettare l'input senza l'inserimento della data -->
                         
-                        <button class="form-button" type="submit" value="Inserisci alimento" name="insert_food" onclick = "insertFood()" >Inserisci alimento</button>
-                        <button class="form-button" type="submit" value="Modifica quantità alimento" name="modify_food" onclick = "showFood(modifyFood)">Modifica quantità</button>
+                        <button class="form-button" type="submit" id = "insert" value="Inserisci alimento" name="insert_food">Inserisci alimento</button>
+                        <button class="form-button" type="submit" id = "modify" value="Modifica quantità alimento" name="modify_food" >Modifica quantità</button>
                         <script>
-                                                                                //script utilizzato per avere come opzioni selezionabili tutti i cibi contenuti nella tabella food
-                            <?php 
+                            
+                            //script utilizzato per avere come opzioni selezionabili tutti i cibi contenuti nella tabella food
+                            document.getElementById("insert").onclick = function(){insertFood()};
+                            //document.getElementById("modify").onclick = function(){showFood(modifyFood)};
+                            document.getElementById("modify").onclick = function(){showFood(modifyFood)};
+                            /*<?php 
                                 $foods = json_encode(getFood());                //la funzione restituisce l'array contenente tutti i cibi ma è codificato in PHP, usiamo json_encode per fare la conversione
                                 echo "const food = ". $foods . ";\n";           //usiamo echo per dichiarare l'array in javascript
-                            ?>
-            
+                            ?>*/
+
+                            food = getOptionFood(showOptionFood);       //otteniamo la lista di opzioni nel database food
+                            /*console.log(food);
+
                             var food_list = document.getElementById('alimenti');
 
                             var option = document.createElement('option');
@@ -357,67 +509,38 @@
                                 option.value = food[i];                         //il valore dell'opzione sarà corrispondente al nome dei cibi      
                                 option.text = food[i];                          //così come il testo al suo interno
                                 food_list.appendChild(option);                  //aggiunge al datalist dinamicamente tutte le opzioni presenti nel database
-                            }
+                            }*/
                         </script>        
                     </form>
                 </div>            
                 
                 <form class="table-form" method="get" id="bottoni" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">       <!--Serve per inserire i pulsanti all'interno della tabella-->
                     <table id="frigo">
-                        <tr>
-                            <th>Alimento</th>
-                            <th>Quantità</th>
-                            <th>Peso (grammi)</th>
-                            <th>Data di scadenza</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                        <tr>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th>Alimento</th>
+                                <th>Quantità</th>
+                                <th>Peso (grammi)</th>
+                                <th>Data di scadenza</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="body">
+                            <tr>
+                            </tr>
+                        </tbody>
                         <script>                                                                      //script utilizzato per la stampa dinamica di tutti gli alimenti salvati nel frigo
-                            <?php 
-                                $aliments = json_encode(getContainedFood($_SESSION["fridge"]));       //la funzione restituisce l'array contenente tutti i cibi ma è codificato in PHP, usiamo json_encode per fare la conversione
-                                echo "const food_fridge = ". $aliments . ";\n";                             //usiamo echo per dichiarare l'array in javascript
 
-                                $id_food = json_encode(getContainedFoodId($_SESSION["fridge"]));
-                                echo "const jid_food =". $id_food . ";\n";
-                            ?>
+                            document.getElementById("form_insert").addEventListener("submit", function(event){
+                                event.preventDefault()
+                            });
 
-                            //const food_fridge = document.getElementById("ajaxres").innerHTML;
+                            document.getElementById("bottoni").addEventListener("submit", function(event){
+                                event.preventDefault()
+                            });
 
-                            //console.log(food_fridge);
 
-                            //document.getElementById("prova").innerHTML= food_fridge;
-
-                            /*var food_table = document.getElementById('frigo');
-
-                            for(let i = 0; i<food_fridge.length; i++)
-                            {
-                                const tr = food_table.insertRow();
-                                for(let j=0;j<4;j++)
-                                {
-                                    let td = tr.insertCell();                               
-                                    if(j==2 && food_fridge[i][j])
-                                        td.innerHTML = food_fridge[i][j]+"g";                              //se l'alimento è salvato in grammi allora stampa la g alla fine
-                                    else
-                                        td.innerHTML = food_fridge[i][j];
-                                }
-                                
-                                let status = tr.insertCell();                                               //dopo aver stampato tutte le informazioni allora aggiunge lo status alla riga corrispondente al cibo
-                                let emoji = emoji_status(food_fridge[i][3]);
-                                status.innerHTML = emoji;
-
-                                var button = document.createElement('button');
-                                
-                                button.className = "table-button";
-                                button.name = "cancel_food";                                //Crea il bottone di cancellazione dell'alimento
-                                button.type = "submit";
-                                button.value = food_fridge[i][4];                           //il valore è corrispondente all'id della riga della tabella contain per il bottone
-                                button.innerHTML = "Cancella";
-                                tr.appendChild(button);                                    //crea automaticamente le righe contenenti i vari alimenti
-                                                          
-                            }
-                            */
                             function emoji_status(expiration_date) {
                                 const current_date = new Date();                                                //funzione che controlla la data di scadenza dell'alimento e restituisce uno status con colori differenti
                                 const exp_date = new Date(expiration_date);
@@ -432,44 +555,6 @@
                                 else if(difference_in_days>7)                                                   //se scade tra più di una settimana cerchio verde
                                     return "&#128994;";
                             }
-
-                            /*function insertFood()
-                            {
-                                let alimenti = document.getElementById("alimenti").value;                       //inseriamo all'interno delle variabili tutti i campi del form che ci possono servire
-                                let altri_alimenti = document.getElementById("other_food").value;
-                                let q_selected = document.getElementById("quantity_selected").value;
-                                let g_selected = document.getElementById("gram_selected").value;
-                                let quantity = document.getElementById("quantity").value;
-                                let gram = document.getElementById("gram").value;
-                                let scadenza = document.getElementById("scadenza").value;
-
-                                /*if (alimenti != null)
-                                {
-                                    food_fridge
-                                }
-                                
-                                if(alimenti != "empty")
-                                {
-                                    if(q_selected != null)
-                                        //parte la richiesta AJAX con il POST e la quantità
-                                    else if(g_slected != null)
-                                        //parte la richiesta AJAX con il POST e i grammi
-                                }
-                                
-                                else if(alimenti == "empty" && altri_alimenti !=null)
-                                {
-                                    if(q_selected != null)
-                                        //parte la richiesta AJAX con il POST e la quantità
-                                    else if(g_slected != null)
-                                        //parte la richiesta AJAX con il POST e i grammi
-                                }
-
-                                else
-                                {
-                                    error="Campo altro cibo vuoto, selezionarne uno dal menù a tendina o inserirne uno nuovo<br>";
-                                    alert(error);
-                                }
-                            }*/
                         </script>
                     </table>
                 </form>

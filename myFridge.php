@@ -270,6 +270,7 @@
                         let q_selected = document.getElementById("quantity_selected").checked;
                         let g_selected = document.getElementById("gram_selected").checked;
                         let altri_alimenti = document.getElementById("other_food").value.toLowerCase();
+                        altri_alimenti = altri_alimenti.trimEnd().trimStart();
                         cibo.quantita = document.getElementById("quantity").value;
                         cibo.grammi = document.getElementById("gram").value;
                         cibo.data_scadenza = document.getElementById("scadenza").value;
@@ -378,6 +379,7 @@
                         let q_selected = document.getElementById("quantity_selected").checked;
                         let g_selected = document.getElementById("gram_selected").checked;
                         let altri_alimenti = document.getElementById("other_food").value.toLowerCase();
+                        altri_alimenti = altri_alimenti.trimEnd().trimStart();
                         cibo.quantita = document.getElementById("quantity").value;
                         cibo.grammi = document.getElementById("gram").value;
                         cibo.data_scadenza = document.getElementById("scadenza").value;
@@ -522,6 +524,7 @@
 
                         let alimento = {};
                         let altri_alimenti = document.getElementById("other_food").value.toLowerCase();
+                        altri_alimenti = altri_alimenti.trimEnd().trimStart();
                         alimento.nome_cibo = altri_alimenti;
                         let last_id = 0;
 

@@ -229,6 +229,7 @@
                                     oReq.onload = function(){
                                         alert('Alimento modificato con successo!');
                                         showFood(printFood);
+                                        document.getElementById('form_insert').reset();
                                     };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
                                     oReq.open("put", "api.php/contain/" + food_fridge[i][7], true);                                            
                                     oReq.send(jsondata);
@@ -244,6 +245,7 @@
                                     oReq.onload = function(){
                                         alert('Alimento modificato con successo!');
                                         showFood(printFood);
+                                        document.getElementById('form_insert').reset();
                                     };          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
                                     oReq.open("put", "api.php/contain/" + food_fridge[i][7], true);                            
                                     oReq.send(jsondata);
@@ -252,7 +254,7 @@
                                     alert("Dati incongruenti, prego rieffettuare correttamente la modifica");
                             }
                         }
-                        document.getElementById('form_insert').reset();
+                        //document.getElementById('form_insert').reset();
                     }
 
                     
@@ -267,6 +269,7 @@
                         ?>
                         let q_selected = document.getElementById("quantity_selected").checked;
                         let g_selected = document.getElementById("gram_selected").checked;
+                        let altri_alimenti = document.getElementById("other_food").value.toLowerCase();
                         cibo.quantita = document.getElementById("quantity").value;
                         cibo.grammi = document.getElementById("gram").value;
                         cibo.data_scadenza = document.getElementById("scadenza").value;
@@ -290,6 +293,7 @@
                                 oReq.onload = function(){
                                     alert('Alimento inserito con successo!');
                                     showFood(printFood);
+                                    document.getElementById('form_insert').reset();
                                 };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
                                 oReq.open("post", "api.php/contain/", true);                                            
                                 oReq.send(jsondata);
@@ -305,6 +309,7 @@
                                 oReq.onload = function(){
                                     alert('Alimento inserito con successo!');
                                     showFood(printFood);
+                                    document.getElementById('form_insert').reset();
                                 };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
                                 oReq.open("post", "api.php/contain/", true);                                            
                                 oReq.send(jsondata);
@@ -315,9 +320,10 @@
                                 
                         else if(alimenti == "empty" && altri_alimenti !=null)
                         {
-                            insertOptionFood(altri_alimenti);                 //deve inserire nella lista delle opzioni il nuovo alimento se non era già presente
+                            console.log(altri_alimenti);
+                            getOptionFood(insertOptionFood);                 //deve inserire nella lista delle opzioni il nuovo alimento se non era già presente
 
-                            if(q_selected == true && !cibo.quantita==false)  //parte la richiesta AJAX con il POST e la quantità
+                            /*if(q_selected == true && !cibo.quantita==false)  //parte la richiesta AJAX con il POST e la quantità
                             {
                                 cibo.grammi = null;
                                 var jsondata = JSON.stringify(cibo);
@@ -326,13 +332,14 @@
                                 oReq.onload = function(){
                                     alert('Alimento inserito con successo!');
                                     showFood(printFood);
+                                    document.getElementById('form_insert').reset();
                                 };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
                                 oReq.open("post", "api.php/contain/", true);                                            
                                 oReq.send(jsondata);
                                 console.log(jsondata);
                             }
                                         
-                            else if(g_slected == true && !cibo.grammi==false) //parte la richiesta AJAX con il POST e i grammi
+                            else if(g_selected == true && !cibo.grammi==false) //parte la richiesta AJAX con il POST e i grammi
                             {
                                 cibo.quantita = null;
                                 var jsondata = JSON.stringify(cibo);
@@ -341,11 +348,12 @@
                                 oReq.onload = function(){
                                     alert('Alimento inserito con successo!');
                                     showFood(printFood);
+                                    document.getElementById('form_insert').reset();
                                 };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
                                 oReq.open("post", "api.php/contain/", true);                                            
                                 oReq.send(jsondata);
                                 console.log(jsondata);
-                            }
+                            }*/
                                         
                         }
 
@@ -354,9 +362,69 @@
                             alert("Errore durante l'inserimento dati");
                         }
 
-                        document.getElementById('form_insert').reset();
+                        //document.getElementById('form_insert').reset();
                     }
 
+                    function insertFoodNotPresent(req)
+                    {
+                        let cibo = {};
+                        let opzioni = JSON.parse(req);   
+                        //let opzioni = JSON.parse(req);
+                                                                                               //creaiamo un oggetto cibo da trasformare in stringa dopo durante la modifica
+                        <?php
+                            $id_frigo = json_encode($_SESSION["fridge"]);
+                            echo "cibo.id_frigo = ".$id_frigo. ";\n";
+                        ?>
+                        let q_selected = document.getElementById("quantity_selected").checked;
+                        let g_selected = document.getElementById("gram_selected").checked;
+                        let altri_alimenti = document.getElementById("other_food").value.toLowerCase();
+                        cibo.quantita = document.getElementById("quantity").value;
+                        cibo.grammi = document.getElementById("gram").value;
+                        cibo.data_scadenza = document.getElementById("scadenza").value;
+                        cibo.id_cibo = 0;
+
+                        console.log(opzioni);                       //l'idea era quella di scorrere tutto il nuovo 
+                        for (let i = 0;i<opzioni.length;i++)
+                        {
+                            console.log(opzioni[i][0]);
+                            console.log(opzioni[i][1]);
+                            if(opzioni[i][1] == altri_alimenti)
+                                cibo.id_cibo = opzioni[i][0];
+                        }
+
+                        if(q_selected == true && !cibo.quantita==false)  //parte la richiesta AJAX con il POST e la quantità
+                            {
+                                cibo.grammi = null;
+                                var jsondata = JSON.stringify(cibo);
+                                        
+                                var oReq = new XMLHttpRequest();
+                                oReq.onload = function(){
+                                    alert('Alimento inserito con successo!');
+                                    showFood(printFood);
+                                    document.getElementById('form_insert').reset();
+                                };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                                oReq.open("post", "api.php/contain/", true);                                            
+                                oReq.send(jsondata);
+                                console.log(jsondata);
+                            }
+                                        
+                            else if(g_selected == true && !cibo.grammi==false) //parte la richiesta AJAX con il POST e i grammi
+                            {
+                                cibo.quantita = null;
+                                var jsondata = JSON.stringify(cibo);
+                                        
+                                var oReq = new XMLHttpRequest();
+                                oReq.onload = function(){
+                                    alert('Alimento inserito con successo!');
+                                    showFood(printFood);
+                                    document.getElementById('form_insert').reset();
+                                };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                                oReq.open("post", "api.php/contain/", true);                                            
+                                oReq.send(jsondata);
+                                console.log(jsondata);
+                            }
+                                        
+                    }
 
                     function showFood(callback)                    //sfruttiamo una funzione di callback chiamata print food
                     {
@@ -432,6 +500,7 @@
                         console.log(food);
                             
                         var food_list = document.getElementById('alimenti');
+                        food_list.innerHTML = null;
 
                         var option = document.createElement('option');
                         option.value = "empty";                               
@@ -452,14 +521,36 @@
                         let opzioni = JSON.parse(food)
 
                         let alimento = {};
-                        alimento.nome_cibo = document.getElementById("other_food");
+                        let altri_alimenti = document.getElementById("other_food").value.toLowerCase();
+                        alimento.nome_cibo = altri_alimenti;
+                        let last_id = 0;
 
-                        var jsondata = JSON.stringify(alimento);
+                        let presentDatabase = false;
+                        for(let i = 0; i<opzioni.length;i++)            //scorre l'array ottenuto dal get della tabella food e si assicura che l'elemento non sia già presente in tabella
+                        {
+                            last_id = opzioni[i][0];                    //salvo l'ultimo id ottenuto
+                            console.log(last_id);
+                            if(opzioni[i][1] == alimento.nome_cibo)
+                            {
+                                alert("Nuova opzione già presente");
+                                presentDatabase = true;
+                            }
+                        }
+                        console.log(last_id);
+                        console.log(typeof opzioni);
+                        
+                        if(presentDatabase == false)                   //se non è presente manda il post e lo inserisce
+                        {
+                            var jsondata = JSON.stringify(alimento);
 
-                        var oReq = new XMLHttpRequest();
-                        oReq.onload = function(){};
-                        oReq.open("post", "api.php/food/", true);
-                        oReq.send(jsondata);
+                            var oReq = new XMLHttpRequest();
+                            oReq.onload = function(){
+                                getOptionFood(showOptionFood);
+                                getOptionFood(insertFoodNotPresent);
+                            };
+                            oReq.open("post", "api.php/food/", true);
+                            oReq.send(jsondata);
+                        }   
                     }
                 </script>
             </head>
@@ -494,7 +585,7 @@
                                 echo "const food = ". $foods . ";\n";           //usiamo echo per dichiarare l'array in javascript
                             ?>*/
 
-                            food = getOptionFood(showOptionFood);       //otteniamo la lista di opzioni nel database food
+                            getOptionFood(showOptionFood);       //otteniamo la lista di opzioni nel database food
                             /*console.log(food);
 
                             var food_list = document.getElementById('alimenti');

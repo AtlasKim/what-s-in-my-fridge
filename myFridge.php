@@ -6,7 +6,7 @@
     require 'db_coding.php'; //Import dei file contententi metodi e variabili globali per effettuare operazioni sul DB
     require 'config/db_config.php';
     
-    $error =" ";
+    //Questa parte di codice php serve solo per gestire la sessione
 
     if(!isset($_SESSION['user']))                                       //se l'utente non è loggato allora viene rimandato alla pagina del login
         header("Location:login.php"); 
@@ -76,9 +76,9 @@
                     {
                         var oReq = new XMLHttpRequest();
                         oReq.onload = function(){
-                            alert('Alimento cancellato con successo!');
-                            showFood(printFood);
-                        };          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                            alert('Alimento cancellato con successo!');             //quando la richiesta viene caricata allora mostra l'alert con il messaggio
+                            showFood(printFood);                                    //una volta terminata l'operazione di delete aggiorna la tabella chiamando la funzione showFood che a sua volta chiamerà la funzione di callback printFood
+                        };          
                         oReq.open("delete", "api.php/contain/" + id_row, true);                         //passa l'id della riga da cancellare nella tabella contain
                         oReq.send();
                     }
@@ -106,7 +106,7 @@
                             if((food_fridge[i][0] == cibo.id_cibo) && food_fridge[i][6] == cibo.data_scadenza)          //se gli id corrispondono e la data di scadenza corrisponde possiamo modificare l'alimento
                             {
                                 console.log("Ho trovato l'alimento con la data di scadenza");
-                                if((food_fridge[i][5] != null && !cibo.grammi==false) && g_selected == true)          //se 
+                                if((food_fridge[i][5] != null && !cibo.grammi==false) && g_selected == true)          //se l'alimento è salvato in grammi e questi stanno venendo modificati allora entra qui
                                 {
                                     console.log("L'alimento era salvato in grammi e tu hai inserito i grammi da modificare");
                                     cibo.quantita = null;
@@ -146,8 +146,7 @@
                     
                     function insertFood()
                     {
-                        let cibo = {};   
-                                                                                               //creaiamo un oggetto cibo da trasformare in stringa dopo durante la modifica
+                        let cibo = {};                                                                 //creaiamo un namespace cibo da trasformare in stringa dopo durante la modifica
                         let alimenti = document.getElementById("alimenti").value;                      //inseriamo all'interno delle variabili tutti i campi del form che ci possono servire
                         <?php
                             $id_frigo = json_encode($_SESSION["fridge"]);
@@ -155,15 +154,15 @@
                         ?>
                         let q_selected = document.getElementById("quantity_selected").checked;
                         let g_selected = document.getElementById("gram_selected").checked;
-                        let altri_alimenti = document.getElementById("other_food").value.toLowerCase();
-                        altri_alimenti = altri_alimenti.trimEnd().trimStart();
+                        let altri_alimenti = document.getElementById("other_food").value.toLowerCase();         //formattiamo tutto in minuscolo
+                        altri_alimenti = altri_alimenti.trimEnd().trimStart();                                  //leviamo gli spazi all'inizio e alla fine
                         cibo.quantita = document.getElementById("quantity").value;
                         cibo.grammi = document.getElementById("gram").value;
                         cibo.data_scadenza = document.getElementById("scadenza").value;
                                 
                         if(alimenti != "empty" && cibo.data_scadenza)
                         {
-                            cibo.id_cibo = alimenti;
+                            cibo.id_cibo = alimenti;                         //viene associato al namespace una proprietà id_cibo contente l'id corrispondente della tabella food
                             if(q_selected == true && !cibo.quantita==false)  //parte la richiesta AJAX con il POST e la quantità
                             {
                                 cibo.grammi = null;
@@ -172,8 +171,8 @@
                                 var oReq = new XMLHttpRequest();
                                 oReq.onload = function(){
                                     alert('Alimento inserito con successo!');
-                                    showFood(printFood);
-                                    document.getElementById('form_insert').reset();
+                                    showFood(printFood);                                    //viene ristampata la tabella
+                                    document.getElementById('form_insert').reset();         //viene resettato il form
                                 };                                                          //quando la richiesta viene caricata allora mostra l'alert con il messaggio
                                 oReq.open("post", "api.php/contain/", true);                                            
                                 oReq.send(jsondata);
@@ -227,7 +226,7 @@
 
                         for (let i = 0;i<opzioni.length;i++)
                         {
-                            if(opzioni[i][1] == altri_alimenti)
+                            if(opzioni[i][1] == altri_alimenti)                 //scorriamo tutte le opzioni finché non troviamo l'id del cibo appena inserito
                                 cibo.id_cibo = opzioni[i][0];
                         }
 
@@ -272,18 +271,17 @@
 
                         var oReq = new XMLHttpRequest();                            //apertura richiesta HTTP
                         oReq.onload = function(){
-                                callback(oReq.responseText);
+                                callback(oReq.responseText);                    //Chiama la funzione di callback dandogli in input la risposta della richiesta HTTP appena effettuata
                         };
-                        oReq.open("get", "api.php/contain/"+ fridge, true);
-                        oReq.send(); //dovrebbe permetterci di inviare l'id del frigo attualmente utilizzato altrimenti usare l'esempio sotto
+                        oReq.open("get", "api.php/contain/"+ fridge, true);   
+                        oReq.send(); 
                     }
 
                     function printFood(oReq)
                     {
                         var food_fridge = JSON.parse(oReq);        //funzione per convertire in array JSON la risposta
-                        var food_table = document.getElementById('frigo');
-                        var table_body = document.getElementById('body');
-                        table_body.innerHTML = null;
+                        var table_body = document.getElementById('body');   //ottiene il corpo della tabella MyFridge così da poterlo stampare
+                        table_body.innerHTML = null;                        //Azzeriamo il body della tabella così da riaggiornarlo
 
                             for(let i = 0; i<food_fridge.length; i++)
                             {
@@ -313,7 +311,7 @@
                                 button.type = "submit";
                                 button.value = food_fridge[i][7];                           //il valore è corrispondente all'id della riga della tabella contain per il bottone
                                 button.innerHTML = "Cancella";
-                                button.onclick = function(){foodDelete(food_fridge[i][7])};         //non so come ho fatto ma funziona
+                                button.onclick = function(){foodDelete(food_fridge[i][7])};         //Quando viene premuto cancella l'elemento con l'id di riga corrispondente
                                 tr.appendChild(button);                                     //crea automaticamente le righe contenenti i vari alimenti
                                                                 
                             }
@@ -358,12 +356,12 @@
                         let altri_alimenti = document.getElementById("other_food").value.toLowerCase();
                         altri_alimenti = altri_alimenti.trimEnd().trimStart();
                         alimento.nome_cibo = altri_alimenti;
-                        let last_id = 0;
+                        //let last_id = 0;
 
                         let presentDatabase = false;
                         for(let i = 0; i<opzioni.length;i++)            //scorre l'array ottenuto dal get della tabella food e si assicura che l'elemento non sia già presente in tabella
                         {
-                            last_id = opzioni[i][0];                    //salvo l'ultimo id ottenuto
+                            //last_id = opzioni[i][0];                    //salvo l'ultimo id ottenuto
                             if(opzioni[i][1] == alimento.nome_cibo)
                             {
                                 alert("Nuova opzione già presente");
@@ -413,7 +411,6 @@
                             document.getElementById("modify").onclick = function(){showFood(modifyFood)};
 
                             getOptionFood(showOptionFood);       //otteniamo la lista di opzioni nel database food
-                        
                         </script>        
                     </form>
                 </div>            
@@ -464,6 +461,9 @@
                 </form>
                 <p id="ajaxres"></p>
                 <p id="prova"></p>
+                <script>
+                    console.log("ciao"); 
+                </script>
             </body>    
         </html><?php
     }?>
